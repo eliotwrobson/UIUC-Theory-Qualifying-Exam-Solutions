@@ -1,0 +1,1956 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+\usepackage{amsthm}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{commath}
+\usepackage{hyperref}
+\usepackage{thmtools}
+\usepackage{mathtools}
+\usepackage{fancyhdr}
+\usepackage{xparse}
+\usepackage{cmap}
+\usepackage{optidef}
+
+\newtheorem{theorem}{Theorem}[section]
+\newenvironment{sketch}[1]{\begin{proof}[Sketch by #1]}{\end{proof}}
+\newenvironment{solution}[1]{\begin{proof}[Solution by #1]}{\end{proof}}
+\newenvironment{scribed}[2]{\begin{proof}[Solution by #1, Scribed by #2]}{\end{proof}}
+
+\newcommand{\ceil}[1]{\left\lceil#1\right\rceil} %Ceiling
+\newcommand{\floor}[1]{\left\lfloor#1\right\rfloor} %Floor
+\newcommand{\inp}[1]{\left\langle #1 \right\rangle} %Inner product
+\newcommand{\compliment}[1]{\overline{#1}}
+
+\NewDocumentCommand{\Prob}{ m o }{%
+    \IfNoValueTF{#2}
+    {\operatorname{\mathbf{Pr}}\mathopen{}\sbr{#1}}
+    {\underset{#2}{\operatorname{\mathbf{Pr}}}\mathopen{}\sbr{#1}}%
+}
+
+\NewDocumentCommand{\Exp}{ m o }{%
+    \IfNoValueTF{#2}
+    {\operatorname{\mathbf{E}}\mathopen{}\sbr{#1}}
+    {\underset{#2}{\operatorname{\mathbf{Pr}}}\mathopen{}\sbr{#1}}%
+}
+
+\oddsidemargin-1.5cm
+\topmargin-1cm     %I recommend adding these three lines to increase the 
+\textwidth19.5cm   %amount of usable space on the page (and save trees)
+\textheight23.5cm
+
+\mathchardef\mhyphen="2D % Define a "math hyphen"
+
+\DeclareMathOperator*{\Range}{Range}
+\newcommand{\ZPP}{\mathsf{ZPP}}
+\newcommand{\RP}{\mathsf{RP}}
+\newcommand{\coRP}{\mathsf{coRP}}
+\newcommand{\EXP}{\mathsf{EXP}}
+\newcommand{\NP}{\mathsf{NP}}
+\newcommand{\Pe}{\mathsf{P}}
+\newcommand{\PSPACE}{\mathsf{PSPACE}}
+\newcommand{\SPACE}{\mathsf{SPACE}}
+\newcommand{\DSPACE}{\mathsf{DSPACE}}
+\newcommand{\NTIME}{\mathsf{NTIME}}
+\newcommand{\DTIME}{\mathsf{DTIME}}
+\newcommand{\Sharp}[1]{\mathsf{\# #1}}
+\newcommand{\sharpP}{\mathsf{\#P}}
+\newcommand{\NPSPACE}{\mathsf{NPSPACE}}
+\newcommand{\NEXP}{\mathsf{NEXP}}
+\newcommand{\coNEXP}{\mathsf{coNEXP}}
+\newcommand{\poly}{\mathsf{poly}}
+\newcommand{\MULT}{\mathsf{MULT}}
+\newcommand{\TQBF}{\mathsf{TQBF}}
+\newcommand{\SAT}{\mathsf{SAT}}
+\newcommand{\threeSAT}{\mathsf{3SAT}}
+\newcommand{\Le}{\mathsf{L}}
+\newcommand{\BPL}{\mathsf{BPL}}
+\newcommand{\IP}[1]{\mathsf{IP}_{#1}}
+\newcommand{\UP}{\mathsf{UP}}
+\newcommand{\coUP}{\mathsf{co \mhyphen UP}}
+\newcommand{\Naturals}{\mathbb{N}}
+\newcommand{\OPT}{\mathsf{OPT}}
+\newcommand{\OTilde}{\widetilde{O}}
+\newcommand{\num}{\mathsf{num}}
+\newcommand{\bin}{\mathsf{bin}}
+\newcommand{\Sortk}{\mathsf{Sort_k}}
+\newcommand{\STCONN}{\mathsf{STCONN}}
+\newcommand{\NL}{\mathsf{NL}}
+\newcommand{\AC}{\mathsf{AC}}
+\newcommand{\BPP}{\mathsf{BPP}}
+\newcommand{\firstHalf}{\mathsf{firstHalf}}
+\newcommand{\secondHalf}{\mathsf{secondHalf}}
+\DeclareMathOperator{\opt}{opt}
+
+\newcommand{\Reals}{\mathbb{R}}
+
+\DeclareMathOperator*{\polylog}{polylog}
+
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{5pt plus 1pt}
+
+\pagestyle{fancyplain}
+%\lhead{\fancyplain{}{\textbf{HW\myhwnum{}}}} % Note the different brackets!
+%\rhead{\fancyplain{}{}}
+%\chead{\fancyplain{}{Past Theory Qualifying Exam Solutions}}
+%\rhead{}
+
+\title{UIUC Theory Qualifying Exam Solutions}
+\author{Eliot Robson} %Add your name here if you contribute
+\date{Spring 2022}
+
+\begin{document}
+
+\maketitle
+
+
+\tableofcontents
+
+\subsection{Introduction}
+Get qualifying exam PDFs from this page \url{https://sarielhp.org/research/algorithms/quals/}.
+
+\subsection{Organization}
+Each section corresponds to a practice exam from the qual archive, and each subsection corresponds to an individual question. Please write your name below the subsection of a question if you wrote the solution for it.
+
+\section{Spring 2021}
+
+\subsection{Algorithms}
+
+\subsubsection{Problem 1: Sort in Bulk}
+You are given \(n\) elements \(e_1, \dots, e_n\) with a total ordering \(\prec\) defined over them. Unfortunately, you have no access to the ordering directly, and instead you are given a sorting procedure \(\Sortk (B[1, \dots, k])\). The procedure \(\Sortk\) receives an array with \(k\) integers and returns it in a sorted order, that is if \(B'[1, \dots, k]\) is the output array, then for all \(i < j\), we have that \(e_{B'[i]} \prec e_{B'[j]}\). The task at hand is to output the indices of the \(n\) elements in sorted order.
+
+\begin{enumerate}
+	\item Proved a lower bound on the number of calls to \(\Sortk\) any algorithm that sorts all the elements has to perform in the worst case, as a function of \(n\) and \(k\). Provide a proof of your lower bound. 
+	
+	\begin{scribed}{Qizheng He}{Eliot Robson}
+		The decision tree in each call to \(\Sortk\) only gives us \(\Omega(\log k!) = \Omega(k \log k)\) bits of information (as each path in the decision tree corresponds to one of the possible \(k!\) permutations, and this tree has depth at most \(\log k\) corresponding to that many comparisons in any execution of the algorithm). Since a similar lower bound of \(\Omega(n \log n)\) exists for comparison based sorting in general, the algorithm must perform at least \(\Omega(\frac{k \log k}{n \log n})\) calls to \(\Sortk\) in total.
+	\end{scribed}
+	
+	\item Provide an algorithm that performs a minimum number of calls to \(\Sortk\) and sort the elements. What is the number of calls your algorithm performs. Prove your bound.
+	% (your algorithm is allowed to be randomized, so then a bound in expectation or high probability is needed)
+	%Matching the lower bound is doiable, but somewhat more challenging. Answer matchingg lower bound up to poly-log factor would be good enough to get most points.
+	
+	\begin{scribed}{Justin Li}{Eliot Robson}
+		We apply a variation on traditional merge sort where, given two sorted blocks we want to merge, we take the smallest \(k/2\) elements in each block, sort them using a single call to \(\Sortk\), then observe that the smallest \(k/2\) elements from the list we just sorted are the smallest among all of the starting elements. So these elements are sorted and we call \(\Sortk\) on the remaining \(k/2\) elements padded with additional elements from the initial sorted blocks.
+        
+        Continuing in this way, we add \(k/2\) elements to our finished list of sorted elements per call to \(\Sortk\). So this merge procedure takes \(O(n/k)\) calls to \(\Sortk\). Thus, the work recurrence for our algorithm becomes \(T(n) = 2 T(n/2) + O(n/k)\). Since there are \(\log (n/k)\) levels in the work recurrence (as we use \(k\) elements as our base case), then our algorithm has runtime \(O(\frac{n}{k} \log (n/k))\). To see this, observe that the number of levels \(x\) satisfies
+        \[
+            k \cdot 2^x \leq n
+            \implies
+            \log(k) + x \log(2) \leq \log(n)
+            \implies
+            x \leq \log_2 (n/k). \qedhere
+        \]
+	\end{scribed}
+\end{enumerate}
+
+
+\subsubsection{Problem 2: Edit with Memory}
+Consider the edit distance problem, where the cost of an operation depends on the operations performed so far. Formally, you are given two strings \(S,T\) (of total length \(n\)), over a constant sized alphabet. Every basic edit operation is either an insert (INS), delete (DEL), or substitution (SUB). As usual, aligning a character with the same character (in the other string) is free, and does not need to be specified as an edit operation.
+
+A solution is a sequence \(\sigma = \sigma_1, \dots, \sigma_t \in \set{INS, DEL, SUB}^*\) of edit operations. For such a sequence \(\sigma\), let \(i(\sigma), d(\sigma), s(\sigma)\) denote the number of insertions, deletions, and substitutions in \(\sigma\), respectively.
+
+For a sequence of edit operations \(\sigma = \sigma_1, \dots, \sigma_t\) and an index \(\alpha\), its \emph{\(\alpha\)-prefix} is \(\sigma_{\leq \alpha} = \sigma_1, \dots, \sigma_\alpha\). The price of the \(\alpha\)th edit operation is
+\[
+	g(\sigma, \alpha)
+	=%
+	f \del{i(\sigma_{\leq \alpha}), d(\sigma_{\leq \alpha}), s(\sigma_{\leq \alpha})},
+\]
+where \(f(\cdot, \cdot, \cdot)\) is a non-negative non-decreasing function (you can evaluate the value of \(f\) in constant time). As such, the \emph{price} of \(\sigma\) is \(\sum_{\alpha = 1}^{t} g(\sigma, \alpha)\).
+
+Provide an algorithm, as efficient as possible, that computes the edit distance between \(S\) and \(T\) under \(f\). What is the running time of your algorithm?
+
+\subsubsection{Problem 3: Divide and Not Share}
+
+\subsubsection{Problem 4}
+Assume that a simple graph \(G = (V,E)\) is given (which has no self loops or multiple edges). An \emph{edge dominating set} is a subset of edges, namely \(F \subset E\), such that every edge in \(E\) has an endpoint which is adjacent to an edge in \(F\). A minimum edge dominating set is an edge dominating set \(F\) whose size \(\abs{F}\) is minimum. Let \(\beta(G)\) denote the number of elements in a minimum edge dominating set.
+
+\begin{enumerate}
+	\item Prove that every maximal matching is an edge dominating set. Conclude that if \(\alpha(G)\) denotes the size of a minimum maximal matching in \(G\), we have \(\beta(G) \leq \alpha(G)\).
+	
+    \begin{solution}{Eliot Robson}
+        For every maximal matching, we have that the endpoints of every edge in the matching are disjoint, and by maximality, there is no way to increase the size of this matching by adding edges. Thus, if there were some edge \(e \in E\) which was not dominated by some element of the maximal matching, \(e\) could be added to the matching, violating the maximality condition.
+        
+        Thus, \(\beta(G) \leq \alpha(G)\) since every maximal matching is trivially an edge dominating set, so the minimum in the function \(\beta\) is being taken over strictly more sets of edges.
+    \end{solution}
+    
+	\item Show that if an edge dominating set is a matching, it must be a maximal matching.
+    
+    \begin{solution}{Eliot Robson}
+        Suppose we have an edge dominating set \(F\) which is a matching and assume towards contradiction it is not maximal, so there is some \(e \in E \setminus F\) such that \(F' = F \cup \set{e}\) is also a matching. However, for \(F'\) to be a matching, there must be no elements of \(F\) which share an endpoints with \(e\), meaning that \(e\) is not dominated by the edges of \(F\). This contradicts our assumption that \(F\) was an edge dominating set, so \(F\) must be maximal.
+    \end{solution}
+	
+	\item Given a minimum edge dominating set \(F\), show that in polynomial time we can find another edge dominating set \(F'\) such that \(\abs{F'} = \abs{F}\) and \(F'\) is a matching. Use this to show that \(\beta(G) \geq \alpha(G)\).
+    
+    \begin{solution}{Eliot Robson}
+        If \(F\) is not a matching, this means there are edges \(e,f \in F\) such that \(e \cap f \neq \emptyset\). Then, all edges incident to the endpoint \(v \in f \setminus e\) are dominated by only \(f\) and not \(e\). If all edges incident to \(v\) are dominated by some edge other than \(f\), we may simply remove \(f\) from \(F\) and would still have an edge dominating set, contradicting the minimality of \(F\). Thus, there must be some edge incident to \(v\) only dominated by \(f\). Call this edge \(f'\) and consider that the set \(F' = F - f + f'\) is still dominating (as all edges incident to \(v\) are now dominated by \(f'\)) but has two less edges which share an endpoint than \(F\) (since by assumption, the only element of \(F\) that \(f'\) shared an endpoint with was \(f\)). Thus, we can repeat this procedure until \(F'\) no longer has any edges which share an endpoint. This runs in polynomial time as we can only run this for \(O(m)\) iterations and each iteration takes polynomial time.
+    \end{solution}
+	
+	\item Conclude from the above that \(\alpha(G) = \beta(G)\), and every minimum maximal matching is a minimum edge dominating set.
+    
+    \begin{solution}{Eliot Robson}
+        From the previous parts we have that \(\alpha(G) \leq \beta(G)\) and \(\alpha(G) \geq \beta(G)\), implying the desired equality. Since every minimum edge dominating set can be transformed into an edge dominating set of equal size which is also a matching, then the minimum taken over all maximal matchings will include all edge dominating sets, meaning that every minimum maximal matching is a minimum edge dominating set.
+    \end{solution}
+	
+	\item When the graph \(G\) is a tree, find a polynomial time algorithm for finding a minimum maximal matching.
+    
+    \begin{sketch}{Eliot Robson}
+        Root arbitrarily and use dynamic programming. Similar to maximum independent set in a tree DP.
+    \end{sketch}
+	
+	\item Give a polynomial time 2-approximation algorithm for find a minimum edge dominating set for general graphs.
+    
+    \begin{solution}{Eliot Robson}
+        Find any maximal matching. Any maximal matching must have size at most 2 times the size of the minimum maximal matching, and as we showed earlier, the size of the minimum maximal matching is equal to the size of the minimum edge dominating set.
+    \end{solution}
+\end{enumerate}
+
+
+\subsection{Complexity}
+
+\subsubsection{Problem 1}
+Evaluate the following complexity-theoretic statements. Prove they are \textbf{true}, \textbf{false}, or \textbf{open}, with appropriate evidence. Let \(\STCONN_n\) be the set of all binary strings of length \(n^2\) that encode the binary adjacency matrix of a directed graph \(G\) with \(n\) vertices, such that there is a path from vertex 1 to \(n\) in \(G\). For the purposes of this problem, we define the directed \((s,t)\)-connectivity problem as \(\STCONN = \bigcup_i \STCONN_i\).
+
+\begin{enumerate}
+    \item \(\STCONN\) is \(\Pe\)-complete, with respect to logspace many-one (aka Karp, aka mapping) reductions.
+    
+    \begin{solution}{Eliot Robson}
+    	This statement is open. The problem \(\STCONN\) is known to be \(\NL\)-complete, and it is in \(\Pe\), but the other inclusion is not known to hold.
+    \end{solution}
+    
+    \item \(\STCONN \in \AC^0\). %Hint: Reduce from parity
+    
+    \begin{scribed}{Furst, Saxe and Sipser}{Eliot Robson}
+    	This statement is false. We reduce from parity. Specifically, given input variables \(x_1, \dots, x_n\), create a graph \(G = (V,E)\) where \(V = \set{v_{s}, v_{x_1}, \dots, v_{x_n}, v_{t}}\). For the edges, let \(x_i\) be the first input variable set to 1 and \(x_j\) be the last input variable set to 1. Then, 
+    	\[
+    		E
+    		=%
+    		\set{v_{s} \to v_{x_i}, v_{x_j} \to v_{t}}
+    		\cup%
+    		\set{v_{x_k} \to v_{x_\ell} : k < \ell, x_k = x_\ell = 1, x_{k+1} = \dots = x_{\ell-1} = 0}.
+    	\]
+    	Thus, \(G\) contains a single path linking \(s\) to \(t\) passing through all variables set to 1 (from smallest to largest). Then, compute the graph \(G^2\) on the vertices \(\set{v_{s}', v_{x_1}', \dots, x_{x_n}', v_{t}'}\) such that there is an edge from \(v_{r}'\) to \(v_{u}'\) only if there is a path of length two from \(v_{r}\) to \(v_{u}\) in \(G\) (where \(v_{r}, v_{u} \in V\)). Thus, there is a path from \(v_{s}'\) to \(v_{t}'\) in \(G^2\) only if the sum of \(x_1, \dots, x_n\) is odd. Because we can solve parity in this we and we know that parity is not in \(\AC^0\), then \(\STCONN \notin \AC^0\).
+    \end{scribed}
+    
+    \item \(\STCONN\) is \(\PSPACE\)-complete.
+    
+    \begin{solution}{Eliot Robson, David Zheng}
+    	This is false. Clearly \(\STCONN \in \PSPACE\) because \(\STCONN \in \NL\) and \(\NL\) problems are solvable in \(O(\log^2 n)\) space by Savitch's theorem. However, by the space hierarchy theorem, there is some language \(L \in \PSPACE\) decidable in \(O(n)\) space and not decidable in \(O(\polylog n)\) space, implying that \(\STCONN\) cannot be reduced to \(L\).
+    \end{solution}
+    
+    \item \(\NP^{\BPP} \subseteq \BPP^{\Pe / \poly}\).
+    
+    \begin{scribed}{James Hulett}{Eliot Robson}
+    	This statement is open. Observe that the right hand side is simply \(\Pe / \poly\) (as we can amplify the success probability of the \(\BPP\) machine). Given this, if \(\NP \not\subseteq \Pe / \poly\), then \(\NP^{\BPP} \not\subseteq \Pe / \poly\). On the other hand, if \(\NP \in \Pe / \poly\), we can show the inclusion in the other direction using similar reasoning to the next problem (essentially show that \(\NP^{\BPP} \subseteq \NP / \poly\) and so \(\NP^{\BPP} \subseteq \Pe / \poly\)).
+    \end{scribed}
+    
+    \item \(\NP^{\BPP} / \poly \subseteq \NP / \poly\).
+    
+    \begin{scribed}{James Hulett}{Eliot Robson}
+        This statement is true from reasoning similar to why \(\BPP \subseteq \Pe / \poly\). Specifically, we replace all oracle calls to \(\BPP\) with their raw computations that output a correct answer with high probability. Thus, we may repeat these computations such that the success probability is amplified such that there must exist a single random string which causes all of the computations to output the correct answer. Then we simply include this random string as part of the polynomial-sized advice.
+    \end{scribed}
+\end{enumerate}
+
+
+\subsubsection{Problem 2 (Sipser 8.13)}
+For each \(n\), exhibit two regular expressions, \(R\) and \(S\), of length \(\poly(n)\), where their languages \(L(R)\) and \(L(S)\) differ, but where the first string on which they differ is exponentially long. That is, \(L(R) \neq L(S)\), but agree on all strings of length up to \(2^{\Omega(n)}\).
+%Hint: Prime numbers, construction over 0^*
+
+\begin{solution}{Eliot Robson}
+	We construct \(R\) as follows. Let \(R_p = (\underbrace{0 \dots 0}_{p})^* 0 \underbrace{(\epsilon + 0) \dots (\epsilon + 0)}_{p-2}\). Observe that \(R_p\) recognizes all strings with a number of zeros which is not divisible by \(p\) and has size \(O(p)\). Then, given some \(n\), define the regular expression \(R = R_{p_1} + \dots + R_{p_n}\) where \(p_1, \dots, p_n\) are the first \(n\) prime numbers. It is clear that \(R\) has size \(\poly(n)\) (as the \(n\)th prime has size \(O(n^2)\) at the most), and \(R\) recognizes all strings with a number of zeros not divisible by at least one of \(p_1, \dots, p_k\). However, this means that \(R\) will not accept the string \(x = 0^{p_1 \dots p_n + 1}\). If we let \(S\) be the expression \(00000(0^*)\), then the first string on which \(L(R)\) and \(L(S)\) differ is \(x\), which has size exponential in \(n\) as desired.
+\end{solution}
+
+\subsubsection{Problem 3}
+Let \(\Sigma = \set{0,1}\) and let \(L \subseteq \Sigma^*\) be a regular language. Given a DFA \(M\), you have an oracle that returns the shortest string \(s \in \Sigma^*\) such that \(s \in L(M) \oplus L\) (where \(X \oplus Y\) is the symmetric difference operator).
+
+\begin{enumerate}
+	\item Prove that if \(M\) and \(M'\) are two DFAs with at most \(t\) states (both over \(\Sigma\)), such that \(L(M) \neq L(M')\), then there exists a string \(s\) of length at most \(t^2\) that is in \(L(M) \oplus L(M')\).
+	
+	\begin{solution}{Eliot Robson}
+		If \(L(M) \neq L(M')\), then there is at least one string \(s \in L(M) \oplus L(M')\). Because the DFA deciding \(L(M) \oplus L(M')\) has at most \(t^2\) states (by the product construction), then treating this DFA as a graph, there is a path of length at most \(t^2\) to an accepting state. This path corresponds to an accepted string of length at most \(t^2\).
+	\end{solution}
+	
+	\item Provide an upper bound, as tight as possible, on the number of distinct DFAs over \(\Sigma\) that have \(t\) states. Here, two DFAs \(M\) and \(M'\) are distinct if \(L(M) \neq L(M')\).
+    
+    \begin{solution}{Eliot Robson, David Zheng}
+        We provide an upper bound on the number of distinct DFAs by counting all DFAs with \(t\) states. Given a DFA with \(t\) states, there are \(t\) choices for the start state, \(t\) choices for both transitions out of each state \(t\) (so \((2t)^t\) choices total), and \(2^t\) ways to set accepting states. Combining these, we have an upper bound of
+        \[
+            t \cdot (2t)^t \cdot 2^t
+            =%
+            t 2^{1 + t + t \log t}. \qedhere
+        \] 
+    \end{solution}
+	
+	\item Assume that \(L\), the above regular language, has a DFA \(M'\) that accepts it with \(t\) states (\(t\) is not given to you), describe an algorithm that computes a DFA that accepts \(L\). Let \(U(t)\) be the number of oracle queries performed by your algorithm. Provide an upper bound on \(U(t)\).
+	
+	What is the running time of your algorithm as a function of \(t\)? %Probably won't be polynomial in t
+    
+    %TODO ask someone and figure out if there's something more expected for this question!!!
+    \begin{solution}{Eliot Robson, David Zheng}
+        Kindof crappy solution, but simply try every DFA for increasing values of \(t\), using the oracle just to check if we've hit the target language yet. \(U(t)\) is equal to our bound from part 2.
+    \end{solution}
+\end{enumerate}
+
+\subsubsection{Problem 4: Some letters are not equal to some other letters}
+
+\begin{enumerate}
+    %https://mathoverflow.net/a/57833
+    \item Show that if \(\Pe = \NP\) then there is a language in \(\EXP\) that requires circuits of size \(\geq \Omega(2^n / n)\) (Arora-Barak, 6.7).
+    
+    \begin{sketch}{Eliot Robson}
+        If \(\Pe = \NP\), then \(\EXP = \EXP^{\Sigma_2^p}\) (i.e., a TM in \(\EXP\) can make oracle queries to the second level of the polynomial hierarchy). We know there is some boolean function \(f : \set{0,1}^n \to \set{0,1}\) which cannot be computed by a circuit of size \(2^n / 10n\). Using polynomial time oracle, we can (binary) search for the size of the circuit of maximum complexity by querying ``there exists a function with circuit complexity \(\geq s\)'' and then find the function \(f\) which is lexicographically first among all functions with maximum complexity by querying ``there exists \(g \leq_{\text{Lex}} f\)'' (only accepting if this query is false). We can indeed enumerate all of these circuits because we want our TM to be in \(\EXP\). Then, we let our TM find this function and only accept strings \(x\) if \(f(x) = 1\). Thus, by construction, the language accepted by this TM requires a circuit of size at least \(\Omega(2^n / n)\).
+    \end{sketch}
+    
+    \item Prove that \(\NP \neq \SPACE(n)\) (Arora-Barak, 3.2).
+    
+    \begin{solution}{Eliot Robson}
+        First, we note that \(\NP\) is closed under logspace reductions because it is closed under polynomial time reductions (equivalently, \(\SPACE(\log n) \subseteq \Pe\)), and that the output length of these reductions must be polynomial. We will now show that \(\SPACE(n)\) is not closed under logspace reductions, which implies our desired claim.
+        
+        For some language \(L \in \SPACE(n^2)\) we define the language \(L' = \set{x \cdot {\#^{n^2 - n}} : n = \abs{x}, x \in L}\). We let \(R\) be a TM which pads the input string \(x\) by \(\#^{n^2 - n}\). Then, if the TM \(M\) decides \(L\) in \(\SPACE(n^2)\), let \(M'\) be the TM which checks that its input is of the form \(x \cdot \#^{n^2 - n}\) and then simulates \(M\) on \(x\). \(M'\) is a linear-space TM, since checking the form of the input only requires \(O(\log \abs{x})\) space and the simulation only requires \(O(\abs{x}^2)\) space (which is linear in the modified input because of the padding). Thus, \(L' \in \SPACE(n)\), but by the space hierarchy theorem, we can let \(L \in \SPACE(n^2) \setminus \SPACE(n)\). Since \(R\) is a logspace reduction from \(L\) to \(L'\), then \(\SPACE(n)\) is not closed under logspace reduction.
+    \end{solution}
+\end{enumerate}
+
+\section{Spring 2020}
+
+\subsection{Algorithms}
+
+\subsubsection{Problem 1}
+Given a binary string \(w = a_1 \dots a_n\) , our task is to decide whether \(w\) contains the substring 00000.
+
+
+\begin{enumerate}
+    \item Argue that every deterministic algorithm solving this problem needs to evaluate \(\Omega(n)\) bits in the worst case.
+    
+    \begin{solution}{Eliot Robson}
+        We will show that any deterministic algorithm must evaluate \(n/5\) bits in the worst case. Suppose some deterministic algorithm evaluates fewer bits than these on some input it rejects some input \(x\) (report \(x\) doesn't contain 00000). By pigeonhole principle, there is some sequence of 5 characters \(a_i, \dots, a_{i+4}\) which were not read by the algorithm. Let \(x'\) be \(x\) with these 5 characters all set to 0. Then, running the algorithm on \(x'\), the algorithm will still reject (as it is deterministic and none of the altered bits were read when the algorithm was run on \(x\)), thus producing the incorrect result. This is a contradiction, and thus, such a deterministic algorithm cannot exist.
+    \end{solution}
+    
+    \item Prove that for a sufficiently large constant \(c\), for any string \(w = a_1 \dots a_c\) that does not contain 00000, there must be two indices \(i,j \in [c]\) such that \(a_i = a_j = 1\) and \(2 \leq \abs{i - j} \leq 5\).
+    
+    \begin{solution}{Eliot Robson}
+        We proceed by case analysis on the string \(w\), with the constant \(c\) to be chosen later. Within the first 5 characters \(a_1, \dots, a_5\), if there are two 1 characters that are not consecutive within these, we are done. These characters are not all zero (as otherwise \(w\) would contain a 00000), so let \(i \in \set{1, \dots, 5}\) be the index of the first 1 character within this range.
+        
+        Now, we consider another 5 characters, \(a_7, \dots, a_{11}\). Again, there must be at least one 1 character (as \(w\) does not contain a 00000). Let \(j \in \set{7, \dots, 11}\) be the index of the last 1 character within this range. Then, by the choice of \(i\) earlier, \(j - i \geq 2\), serving as our desired indices. Our analysis succeeds setting \(c = 11\).
+    \end{solution}
+    
+    \item
+\end{enumerate}
+
+\subsubsection{Problem 2}
+We have a directed graph \(G = (V,E)\), where each edge has a label from a finite alphabet \(\Sigma\). The label of any walk in \(G\) is a string in \(\Sigma^*\), formed by concatenating the labels of the edges in order. Edge labels are accessible through the function \(\ell : E \to \Sigma\). A \textit{palindrome walk} is a walk whose label is a palindrome.
+
+\begin{enumerate}
+    \item Lets first consider the special case where \(G\) is acyclic. Describe an algorithm to find a longest palindrome walk in an edge-labeled dag.
+    
+    \begin{solution}{Eliot Robson}
+    	First, note that every valid walk in a DAG is a path, since after visiting a vertex, we cannot visit it again (as there are no cycles). Thus, we can solve this problem by constructing a new graph \(G'\) such that every walk in \(G'\) corresponds to a palindrome walk in \(G\). Then, we can use the standard longest-path algorithm for DAGs and return the final answer.
+    	
+    	In more detail, we have the graph \(G' = (V', E')\), where we define
+    	\begin{align*}
+    		V' &= V \times V,\\
+    		E' &= \set{(u_1, u_2) \to (v_1, v_2) \mid v_1 \to u_1, u_2 \to v_2 \in E, \ell(v_1 \to u_1) = \ell(u_2 \to v_2)}.
+    	\end{align*}
+    	Consider some palindrome walk \(P\) in \(G\) starting at \(a\) and ending at \(b\). We will show that this walk corresponds to some path \(P'\) in \(G'\) from a particular start vertex. Two cases follow:
+        \begin{enumerate}
+            \item \(P\) has an even number of edges. Then, \(P\) has an even number of vertices. Let \(v^*\) be the middle vertex in the walk \(P\). Then, this walk \(P\) corresponds to a path in \(G'\) starting from \((v^*, v^*)\) going to \((a,b)\). 
+            
+            \item \(P\) has an odd number of edges. Then, \(P\) has an even number of vertices. Let \(e = (u^*, v^*)\) be the middle edge in the walk \(P\) . Then, \(P\) corresponds to the path in \(G'\) starting from \((u^*, v^*)\) and ending at \((a,b)\).
+        \end{enumerate}
+        In either case, the palindrome walk \(P\) corresponds to a walk in \(G'\) starting from a vertex pair in \(V'\) that corresponds to a connected edge or single vertex in \(V\). Thus, to find the longest palindrome walk in \(G\), we find the longest path in \(G'\) from every source vertex \((u,v) \in V'\) such that either \(u = v\) (the middle of the walk is a single vertex) or \(u \to v \in E\) (the middle of the walk is a single edge) and return the maximum.
+    \end{solution}
+    
+    \item Describe an algorithm that either finds the longest palindrome walk in \(G\), or correctly reports that there are arbitrarily long palindrome walks in \(G\).
+    
+    \begin{solution}{Eliot Robson}
+        Use the construction from part (a) on the graph \(G\). If during the process of searching for a longest path in \(G\) a cycle is found, then this corresponds to there being palindrome walks of arbitrary length. If this does not happen, simply return the longest walk found.
+        
+        Note that the cycle must be found when starting from one of the stated start points. There could be cycles in \(G'\) that arise from traversing paths that do not correspond to palindrome walks in \(G\) otherwise.
+    \end{solution}
+    
+    \item Prove that finding the longest palindrome \textit{path} in \(G\) is NP-hard. (A path is a walk which does not repeat vertices)
+    
+    \begin{solution}{Eliot Robson}
+        We will reduce from (directed) Hamiltonian path. Given \(G = (V, E)\) as an input instance to Hamiltonian path, we let \(\Sigma = \set{1}\) and assign every edge in \(G\) the label 1. Thus, all paths in \(G\) are trivially palindrome paths.
+        
+        If we get the longest palindrome path in \(G\), this is the longest path in \(G\), and so we accept if the length of this path is \(n = \abs{V}\), rejecting otherwise. This reduction correctly solves the Hamiltonian path problem. The addition of the labels and the final length check of the path size run in linear time, so the reduction overall runs in polynomial time.
+    \end{solution}
+\end{enumerate}
+
+\subsubsection{Problem 3}
+Let \(G = (V,E)\) be an edge-weighted directed graph with \(c : E \to \mathbb{Z}_+\) denoting the edge costs/weights. Given two distinct nodes \(s,t\), we wish to find two edge disjoint paths from \(s\) to \(t\).
+
+\begin{enumerate}
+    \item Suppose we want to find two edge-disjoint paths such that each path is of cost at most a given bound \(B\). Prove that deciding the existence of such paths is NP-complete.
+    
+    \begin{solution}{Eliot Robson}
+        It is clear that this problem is in NP. To show it is NP-hard, we reduce to ...
+    \end{solution}
+    
+    \item Consider a relaxed version where we minimize the sum of the costs of the edges in the two disjoint paths. In the literature there is an algorithm called Surballe's algorithm. It consists of two iterations. In the first iteration, it finds a shortest \(s\)-\(t\) path \(P_1\). It then reverses the edges in \(P_1\), negates the cost on those edges, and finds a second shortest path \(P_2\). It adds up the costs of the two paths. Prove that the algorithm is correct and can be implemented to run in polynomial time. In particular, how can you compute the shortest path in the second iteration when there are some negative length edges.
+    
+    \begin{sketch}{Eliot Robson}
+        This algorithm outputs the correct sum of edges because taking the sum of the lengths of edges in both graphs, the cost of any pair of paths returned by the algorithm (after the first iteration and including negative edges from the second) is equal to the cost of taking the symmetric difference of edges in the paths. This symmetric difference leaves us with two edge disjoint paths in the original graph, and so taking shortest paths in both of these graphs, we consider all possible pairs of edge disjoint paths and thus take the minimum over all of those. This result also follows from the correctness of min cost flow.
+        
+        This can be implemented to run in polynomial time by using Bellman-Ford's algorithm in the second iteration. The reversal and negation of edges of \(P_1\) cannot result in a negative length cycle, as otherwise, \(P_1\) would have higher weight than the edges in the forward direction, a contradiction as \(P_1\) is the shortest path.
+    \end{sketch}
+\end{enumerate}
+
+\subsubsection{Problem 4}
+Recall that for an undirected graph \(G = (V,E)\) with positive edge weights, a subgraph \(H = (V, E_H)\) is a \(t\)-spanner if, for any \(u,v \in V\), we have that \(d_G (u,v) \leq d_H(u,v) \leq t \cdot d_G(u,v)\).
+
+The greedy spanner construction is an extension of Kruskal's algorithm. Let \(e_1, \dots, e_m\) be edges of \(E\) sorted in increasing order of lengths. The algorithm starts with \(H\) empty over the vertices of \(G\). In the \(i\)'th iteration, the algorithm checks if \(d_H(u_i, v_i) > t \cdot d_G(u_i, v_i)\), where \(e_i = u_i v_i\). If so, the algorithm adds \(e_i\) to \(H\), otherwise discarding \(e_i\).
+
+\begin{enumerate}
+    \item Prove that the minimum spanning tree is a \((n-1)\)-spanner.
+    
+    \begin{solution}{Eliot Robson}
+        Consider the shortest path between two vertices \(u,v \in V\) in the minimum spanning tree \(T\). Let \(e\) be the heaviest edge in this path. Let \(U\) and \(V\) be the connected components containing \(u\) and \(v\) respectively in \(T - e\). Then, \(e\) must be the cheapest edge crossing the cut \((U, V)\). If we consider the shortest path between \(u\) and \(v\) in \(G\), the weight of each edge of this path that crosses the cut \((U,V)\) (and thus the weight of the whole path itself) must be at least the weight of \(e\). In other words, \(w(e) \leq d_G (u,v)\).
+        
+        Thus, if we let \(P\) be the shortest path from \(u\) to \(v\) in \(T\), then we have that
+        \[
+            \sum_{e \in P} w(e)
+            \leq%
+            \sum_{e \in P} d_G(u,v)
+            =%
+            \abs{P} d_G(u,v)
+            \leq%
+            (n-1) \cdot d_G(u,v),
+        \]
+        giving the desired inequality.
+    \end{solution}
+
+    \item Prove that the greedy algorithm outputs a \(t\)-spanner.
+    
+    \begin{solution}{Eliot Robson}
+        By the condition used to add edges in the greedy spanner, for any \(uv \in E_H\), we have that \(d_G(u,v) \leq d_H(u,v) \leq t d_G(u,v)\). To show the claim in the general case, we let \(a,b \in V\) be arbitrary vertices in \(G\) and assume toward contradiction that \(d_H(a,b) > t d_G(a,b)\). If we let \(P\) be the path in \(G\) which witnesses \(d_G(a,b)\), we have that
+        \[
+            t \sum_{uv \in P} w(uv)
+            =%
+            t d_G (a,b)
+            <%
+            d_H(a,b)
+            \leq%
+            \sum_{uv \in P} d_H (u,v),
+        \]
+        where the last step follows by applying the triangle inequality for graph distances. However, the above sum implies there is an edge \(e^* = u^* v^*\) such that \(t \cdot w(u^* v^*) < d_H(u^*, v^*)\),  and since \(d_G(u^*, v^*) \leq w(u^* v^*)\), then we have that \(t d_G(u^*, v^*) < d_H(u^*, v^*)\), contradicting the condition for adding edges in between adjacent vertices in the algorithm. Thus, we have that \(d_G(a,b) \leq d_H(a,b) \leq t d_G(a,b)\) for arbitrary \(a\) and \(b\) as desired.
+    \end{solution}
+
+    \item Suppose \(G\) has unit weights on its edges (this holds for subsequent parts). Prove that the shortest cycle in the computed graph \(H\) is of length at least \(t + 2\).
+    
+    \begin{solution}{Eliot Robson}
+        Take an arbitrary cycle \(C\) in \(H\) and let \(e_C = uv\) be the last edge of this cycle added by the algorithm. At the time \(e_C\) was added, it must be that \(d_H (u,v) > t d_G(u, v)\). Since \(u\) and \(v\) are connected and all edges have unit weight, then \(d_G(u,v) = 1\), and because \(uv\) is the last edge of the cycle added, \(\abs{C}-1 \geq d_H(u,v)\) (as the edges of \(C - uv\) form a path between \(u\) and \(v\)). Combining these expressions, we have that
+        \[
+            t < d_H(u,v) \leq \abs{C} - 1
+            \implies
+            \abs{C} > t+1.
+        \]
+        Since \(C\) was an arbitrary cycle, this means that every cycle \(C\) has length \(\abs{C} \geq t+2\), which is also true of the shortest cycle.
+    \end{solution}
+
+    \item Prove that a graph \(G\) with more than (say) \(10 n^{1 + 1/t}\) edges must contain a cycle with \(\leq 2 t + 2\) edges.
+    %Hint: intially assume all vertices have same degree, and graph is connected
+    
+    \begin{solution}{Eliot Robson}
+        We proceed by contrapositive, proving that a graph that has no cycles with \(\leq 2t + 2\) edges has, at most, \(10 n^{1 + 1/t}\) edges. Let \(G\) be an arbitrary graph with no cycles of \(\leq 2t + 2\) edges. While \(G\) has a vertex of degree \(\leq 5 n^{1/t}\), remove the lowest degree vertex (deleting all incident edges) and recurse on the remaining graph. Let \(G'\) be the graph after this process is completed.
+        
+        First consider the case if \(G'\) is empty. Then, each vertex must have had at most \(5 \ceil{n^{1/t}}\) incident edges when it was removed. As we removed each vertex, \(G\) had at most \(5 n^{1/t} \cdot n \leq 10 n^{1 + 1/t}\) edges as desired.
+        
+        We claim that \(G'\) must be empty. Assume toward contradiction it is not and let \(v \in G'\) be some vertex. Consider growing a set of vertices \(S\) around \(v\) by continually adding the neighborhood of \(S\) for \(t\) iterations. As there are no cycles of length \(\leq 2t + 2\), \(S\) cannot contain a cycle and must be a tree. Since every vertex of \(S\) has degree at least \(5 \ceil{n^{1/t}}\), then \(S\) has at least \(\del{5 \ceil{n^{1/t}} - 1}^t > n\) vertices, a contradiction. Thus, \(G'\) must be empty and then the bound from the first case always applies, implying our original statement.
+    \end{solution}
+
+    \item Prove that the \(t\)-spanner computed above has at most \(O(n^{1 + 2/t})\) edges.
+    
+    \begin{solution}{Eliot Robson}
+        From part 3, we have that the shortest cycle in the computed \(t\)-spanner \(H\) has length at least \(t + 2\), so in other words, it has no cycles of length \(\leq 2(t/2) + 2\). Applying the contrapositive from part 4, if a graph \(G\) has no cycles of length \(\leq 2s + 2\), then it has at most \(10n^{1 + 1/s}\) edges. In the case of the \(t\)-spanner \(H\), this means that \(H\) has at most \(10 n^{1 + 1/(t/2)} = O(n^{1 + 2/t})\) edges as desired.
+    \end{solution}
+\end{enumerate}
+
+\subsection{Complexity}
+
+\subsubsection{Problem 1}
+\begin{enumerate}
+    \item Given a language \(L\) over the finite alphabet \(\Sigma\), define
+    \[
+        \textsc{Once}(L)
+        =%
+        \set{a_1 \dots a_n  : \text{There is exactly one index pair \((i,j)\) such that the substring \(a_i \dots a_j \in L\)}}.
+    \]
+    Show that, if \(L\) is regular, then \(\textsc{Once}(L)\) is regular as well.
+    
+    \begin{solution}{Eliot Robson}
+        To show this, we must show that given a DFA \(M = (\Sigma, Q, s, A, \delta)\) accepting \(L\), we can construct an DFA deciding \(\textsc{Once}(L)\). Intuitively, we will construct our DFA such that it runs a copy of \(M\) on every substring of the input (corresponding to every index pair), and then change the set of accepting states to correspond to \textit{exactly one} copy being in an accepting configuration. This will correspond to exactly one substring of the input belonging to the language \(L\), as desired.
+        
+        We define the following DFA \(M' = (\Sigma, Q', s', A', \delta')\) as follows:
+        \begin{align*}
+            Q' &= \mathcal{P}(Q \times \set{1, 2, 1d, 2d})\\
+            s' &= \set{(s, 1)}\\
+            \delta'(R, a) &= \set{(s,1)}\\
+                &\quad \cup \set{(r, 1d) \mid (r, 1) \in R \text{ xor } (r, 1d) \in R}\\
+                &\quad \cup \set{(r, 2d) \mid \set{(r,1), (r,1d)} \subseteq R \text{ or } (r, 2) \in R \text{ or } (r, 2d) \in R}\\
+                &\quad \cup \set{(q, 1) : \sum_{(p, c) \in R, \delta(p, a) = q, c \neq done} c = 1}\\
+                &\quad \cup \set{(q, 2) : \sum_{(p, c) \in R, \delta(p, a) = q, c \neq done} c \geq 2}\\
+            A' &= \set{R \in Q' : \abs{\set{(r, c) \in R : r \in A}} = 1,  \abs{\set{(r, c) \in R : r \in A, c \in \set{2, 2r}}} = 0}.
+        \end{align*}
+        This new DFA \(M'\) captures the behavior of starting a new parallel thread on the old DFA for each substring of the input string \(w\). More concretely, the state \(Q'\) indicates the number of parallel threads and their location on the original DFA (where each state in \(Q\) can have 1 or 2 active threads on it at a given time). Each time a state \(q\) is visited, the transition function adds a tuple representing the number of times that state has been visited by any number of parallel threads. This DFA starts new parallel threads by always adding the pair \((s,1)\) to the vertices to be visited by a transition function (representing starting again from the start vertex after ignoring some number of start characters).
+        
+        The accept states \(A'\) are such that the DFA \(M'\) only accepts if all of the accept states \(A\) in the original DFA \(M\) have been visited only once collectively by all parallel threads. This is because having been visited more than once by parallel threads (even if not at the moment the DFA \(M'\) stops reading in characters) corresponds to multiple substrings of the input string \(w\) being accepted by the original DFA. Thus, this accepting behavior and the transition behavior mean that \(M'\) accepts the language \(\textsc{Once}(L)\), meaning that \(\textsc{Once}(L)\) is regular.
+    \end{solution}
+ 
+    \item
+\end{enumerate}
+
+\subsubsection{Problem 2}
+\begin{enumerate}
+    \item Prove that \(\coNEXP \subseteq \NEXP / (n+1)\)
+    
+    \begin{scribed}{Shubhang Kulkarni}{Eliot Robson}
+    	Let \(L \in \NEXP\) be a \(\NEXP\)-complete language, and let \(M_L\) be an NDTM witnessing that \(L \in \NEXP\). Then \(\compliment{L} \in \coNEXP\) is \(\coNEXP\)-complete as well.
+    	
+    	Let \(a_n\) be a binary string representing the number of strings of length \(n\) in \(L\). Thus \(\abs{a_n} \leq n+1\) since the value of \(a_n\) is less than \(2^{n}\).
+    	
+    	Given some string \(x \in \set{0,1}^*\) of length \(n\), we will construct a \(a_n\)-advice taking TM \(M^*\) that decides whether \(x \in \compliment{L}\). The TM \(M^*(x, a_n)\) does the following:
+    	\begin{enumerate}
+    		\item Non-deterministically guess \(a_n\) strings of length \(n\). This can be done in \(2^{O(n)}\) time.
+    		
+    		\item Check that each guessed string \(y\) is in \(L\) by running \(M_L(y)\), and check that each guessed string is distinct from all others. This can be done in \(2^{O(n)} \cdot 2^{\poly(n)}\) time.
+    		
+    		\item If the number of guessed strings in \(L\) is less than \(a_n\), \(M^*\) rejects. Otherwise, if the number is equal to \(a_n\) and \(x\) was not among the guessed strings, \(M^*\) accepts.
+    	\end{enumerate}
+    
+    	At a high level, \(M^*\) enumerates every string in \(L\) of length \(n\) and then checks whether \(x\) is among those strings. If not, then \(x \in \compliment{L}\) and \(M^*\) accepts, otherwise rejecting. The advice string \(a_n\) is used to ensure that \(M^*\) indeed enumerates all strings of length \(n\) in \(L\). Thus \(M^*\) decides \(\compliment{L}\).
+    	
+    	As \(M^*\) runs in \(2^{poly(n)}\) time and uses a length \(n+1\) advice string, then \(M^*\) witnesses that \(\compliment{L} \in \NEXP / (n+1)\), implying the desired inclusion.
+    \end{scribed}
+
+    
+    \item Given the above, prove that \(\NEXP / \poly = \coNEXP / \poly\).
+    
+    \begin{solution}{Eliot Robson, David Zheng}
+        By part 1, it is clear that \(\coNEXP / \poly \subseteq \NEXP / \poly\) (simply simulate the behavior of the \(\coNEXP\) NDTM with an additional \(n+1\) sized advice, which keeps the size of the advice string polynomial). The other inclusion follows from the fact that the proof of 1 can be modified to check that the given NDTM returns no, and thus \(\NEXP \subseteq \coNEXP / (n+1)\) by similar reasoning. 
+    \end{solution}
+\end{enumerate}
+
+\subsubsection{Problem 3 (Arora-Barak, Exercise 7.6)}
+Show that \(\RP \cap \coRP = \ZPP\) (using the definition of \(\ZPP\) from the problem statement).
+
+\begin{solution}{Eliot Robson}
+    We show both inclusions here.
+    
+    \(\RP \cap \coRP \subseteq \ZPP\)\\
+    For \(L \in \RP \cap \coRP\), we have a RTM \(M_{\RP}\) which witnesses \(L \in \RP\), and another RTM \(M_{\coRP}\) which witnesses \(L \in \coRP\). We define the RTM \(M_{\ZPP}\) as follows. Given an input \(x\), \(M_{\ZPP}\) first runs \(x\) on \(M_{\RP}\), accepting if \(M_{\RP}(x) = 1\). Otherwise, \(M_{\ZPP}\) then runs \(x\) on \(M_{\coRP}\) and rejects if \(M_{\coRP}(x) = 0\). If neither of these cases occurs, \(M_{\ZPP}\) just returns `\(?\)'.
+    
+    We first show that \(M_{\ZPP}\) never returns a wrong answer. If \(x \in L\), observe the only way \(M_{\ZPP}\) can reject is if the call to \(M_{\coRP}(x)\) does, which it will not since a TM in \(\coRP\) will never reject a string in the language. Similarly, if \(x \notin L\), the only way that \(M_{\ZPP}\) can accept is if \(M_{\RP}\) does, which it will not since a TM in \(\RP\) will never accept a string not in the language. Thus, \(M_{\ZPP}\) never outputs a wrong answer.
+    
+    Next, we must show that \(M_{\ZPP}\) will only output `\(?\)' with probability at most \(1/3\). If \(x \in L\), \(M_{\coRP}\) will never reject, and thus we only output `\(?\)' if \(M_{\RP}\) rejects, which it does with probability \(\leq 1/3\) in this case (as it accepts with probability \(\geq 2/3\)). Otherwise, if \(x \notin L\), \(M_{\RP}\) will never accept, and thus we only output `\(?\)' if \(M_{\coRP}\) accepts, which it does with probability \(\leq 1/3\) in this case (as it rejects with probability \(\geq 2/3\)). In either case, \(M_{\ZPP}\) only outputs `\(?\)' with probability at most \(1/3\), and accepts or rejects (with no error) with probability at least \(2/3\). Since \(M_{\ZPP}\) always runs in polynomial time, \(M_{\ZPP}\) correctly witnesses that \(L \in \ZPP\) as desired.
+    
+    \(\RP \cap \coRP \supseteq \ZPP\)\\
+    Let \(M_{\ZPP}\) be the RTM witnessing \(L \in \ZPP\), and let \(T_{\ZPP}(x)\) be the running time of \(M_{\ZPP}\) on \(x\). We will first show that \(L \in \RP\). Define the TM \(M_{\RP}\), which runs \(x\) on \(M_{\ZPP}\) for \(20 \Exp{T_{\ZPP}(x)}\) many steps 20 independent times, accepting if any of these runs accepts, and rejecting otherwise (all the runs time out or return `?').
+    
+    Our TM \(M_{\RP}\) always runs in polynomial time because \(\Exp{T_{\ZPP}(x)}\) is polynomial in \(\abs{x}\). Since \(M_{\ZPP}\) never returns a wrong answer, and our only deviation from the behavior of \(M_{\ZPP}\) is to reject, \(M_{\RP}\) will never accept some \(x \notin L\). So it remains to show that \(M_{\RP}\) rejects any \(x \in L\) with probability \(\leq 1/3\). Recall that \(M_{\ZPP}\) outputs `?' with probability \(\leq 1/3\), and that by Markov's inequality, we have that the runtime \(T_{\ZPP}(x)\) of \(x\) on \(M_{\ZPP}\) satisfies
+    \[
+        \Prob{T_{\ZPP}(x) \geq 20 \Exp{T_{\ZPP}(x)}}
+        \leq%
+        \frac{\Exp{T_{\ZPP}(x)}}{20 \Exp{T_{\ZPP}(x)}}
+        =%
+        \frac{1}{20}.
+    \]
+    Thus, using the union bound, the probability of an individual run of the algorithm rejecting is at most \(\frac{1}{3} + \frac{1}{20} \leq \frac{23}{60}\). Because we run the algorithm 20 independent times, the probability of \(M_{\RP}\) rejecting \(x \in L\) after all of these runs is at most
+    \[
+        \del{\frac{23}{60}}^{20} < \frac{1}{3},
+    \]
+    so \(M_{\RP}\) correctly witnesses the fact that \(L \in \RP\).
+    
+    Next, we show that \(L \in \coRP\) in very similar fashion to our previous proof. We define \(M_{\coRP}\) similarly to \(M_{\RP}\), except that if all runs of \(M_{\ZPP}\) time out or output `?', then \(M_{\coRP}\) accepts. As before, our new TM only deviates from the output of \(M_{\ZPP}\) by accepting, meaning that if \(x \in L\) we will always accept.
+    
+    If \(x \notin L\), we want to show that \(\Prob{M_{\coRP}(x) = 1} \leq 1/3\). As before, an individual run of the algorithm can only accept with probability at most \(\frac{23}{60}\), and so the probability we accept after 20 independent runs of the algorithm is \(\del{\frac{23}{60}}^{20} < \frac{1}{3}\) as desired. Thus, \(M_{\coRP}\) witnesses that \(L \in \coRP\), and with our previous statements, \(L \in \RP \cap \coRP\).
+\end{solution}
+
+\subsubsection{Problem 4}
+Let \(A\) be a regular language over \(\set{0,1}\). Show that \(A\) has circuits (over AND, OR, and NOT gates of fan-in 2) where the circuit \(C_n\)  for \(A\) over \(\set{0,1}^n\) is simultaneously \(O(n)\)-size and \(O(\log n)\)-depth.
+
+\begin{sketch}{Eliot Robson, David Zheng}
+	Use a divide and conquer strategy on the input. Specifically, we can show that, if \(L\) is a regular langegae, then languages \(\firstHalf(L)\) and \(\secondHalf(L)\) are both regular (where these languages are the first halves and second halves of strings in \(L\), which can be shown by an NFA construction). Then we split the original input in half, creating circuits for \(\firstHalf(L)\) and \(\secondHalf(L)\) where each circuit returns a 1 bit for every state which is a possible starting or ending point (respectively) for the DFA for \(L\) after reading in the first or second half of the input. Then if there are any shared bits (i.e.\ after reading in the first half of the input and second half of the input, there are shared states among the respective ends / starts), we return true. Otherwise false. Since the DFA has a constant number of states, this merge step takes \(O(1)\) many gates, so this results in an overall circuit with \(O(\log n)\) depth and \(O(n)\) size.
+\end{sketch}
+
+\section{Fall 2019}
+
+\subsection{Algorithms}
+
+\subsubsection{Problem 1}
+Let \(G = (V,E)\) be a directed graph. Describe a polynomial time algorithm to find the fewest number of edges from \((V \times V) \setminus E\) that need to be added to \(G\) to make it strongly connected.
+
+\begin{solution}{Eliot Robson}
+    Initially, let \(G\) have a single connected component (we will extend to the general case later). We now consider \(G_{SCC}\), the meta-graph of strongly connected components of \(G\). Our algorithm will proceed recursively on this graph. If \(G_{SCC}\) is a single vertex, \(G\) is strongly connected and we are done (the answer is 0). Otherwise, the algorithm returns the max of the number of source vertices and the number of sink vertices in \(G_{SCC}\).
+    
+    This algorithm clearly runs in polynomial time, so it remains to show that the algorithm outputs the desired quantity. Let \(k\) be the output of the algorithm on some input graph \(G\). We will prove that the minimum number of edges needed to strongly connect \(G\) is \(k\) by induction on \(k\).
+    
+    The algorithm is clearly correct if \(G_{SCC}\) is a single vertex. If \(k = 1\), this is simply a path graph, so it can be strongly connected by adding a single directed edge from the sink vertex to the source.
+    
+    For the inductive step, there are two cases to consider. If the number of source vertices and sink vertices are equal, then we let \(s\) and \(t\) be a source and sink vertex respectively. Let \(G'\) be the graph with the sink vertex \(t\) and all of its parent vertices with a single child removed, and also the source vertex \(s\) with all of its child vertices with a single parent removed. This operation means that \(G'\) has one less sink and source vertex than \(G\), and so we may apply our inductive hypothesis and have that for \(k' = k-1\), \(G'\) may be strongly connected with only \(k'\) edges (the quantity returned by the algorithm).
+    
+    Let \(E' \subset V \times V \setminus E\) be the edges witnessing that \(k'\) is the minimum number of vertices to strongly connect \(G'\). Then, the graph \((G \cup E')_{SCC}\) has one source and one sink vertex, \(s\) and \(t\), as we know that \(G' \cup E'\) is strongly connected. Thus, by adding the directed edge \(t \rightarrow s\) to the collection \(E'\), we have a collection of edges of size \(k\) which strongly connects \(G\) as desired.
+    
+    In the other case, where the number of source and sink vertices are unequal, let \(s\) be a source / sink vertex for whichever quantity is larger. Then, using the same source / sink removal operation as above (depending on what \(s\) is), we let \(G'\) be the graph with \(k' = k-1\) being the output of the algorithm on \(G'\). With \(E'\) again being the edges that witness \(k'\), we consider \((G \cup E')_{SCC}\), and observe that \(s\) is a source or sink vertex in this graph. Thus, since our removal operation only removed vertices with in or out degree at most 1, then \((G \cup E')_{SCC}\) is a path graph with \(s\) as an endpoint, and so we may strongly connect \(G \cup E'\) by adding a single edge. Therefore, we can again strongly connect \(G\) by adding \(k\) edges.
+    
+    To extend our algorithm to the arbitrary case, for an arbitrary input graph \(G\), our algorithm runs the above subroutine on each connected component of \(G\) and sums the results. Then, we add \(c+1\) to this result, where \(c\) is the number of connected components in \(G\). This is because in the SCC graph, each connected component becomes a vertex, and the minimal way to strongly connect \(c\) isolated vertices is by adding \(c+1\) edges, making them into a cycle.
+\end{solution}
+
+\subsubsection{Problem 2}
+Describe and analyze an algorithm to determine whether one string \(X\) occurs as two disjoint subsequences of another string \(Y\).
+
+\begin{solution}{Eliot Robson}
+    We will solve this with dynamic programming. To give a high level overview of our DP, for each character in the string \(Y\), it can be ignored, matched to a character of the first copy of \(X\), or matched to a character of the second copy of \(X\). Then, our algorithm is described by the following recurrence:
+    \begin{align*}
+        &\text{sub}(i, j, k)\\
+        &=%
+        \begin{cases}
+            True &\text{if } i = j = 0\\
+            False &\text{if } k = 0 \wedge (i \neq 0 \vee j \neq 0)\\
+            \text{sub} (i-1, j, k-1)
+            &\text{if } X[i] = Y[k] \wedge (X[j] \neq Y[k] \vee j = 0)\\
+            \text{sub} (i, j-1, k-1)
+            &\text{if } (X[i] \neq Y[k] \vee i = 0) \wedge X[j] = Y[k]\\
+            \min \cbr{\text{sub}(i-1, j, k-1), \text{sub}(i, j-1, k-1)}
+            &\text{if } X[i] = Y[k] \vee X[j] = Y[k]\\
+            \text{sub} (i,j, k-1)
+            &\text{if } X[i] \neq Y[k] \vee X[j] \neq Y[k]
+        \end{cases}
+    \end{align*}
+    Our final answer is \(\text{sub}(\abs{X}, \abs{X}, \abs{Y})\). In words, \(\text{sub}(i,j,k)\) is true if the string \(X[i, ...]\) and \(X[j, ...]\) are disjoint subsequences of \(Y[k,...]\).
+\end{solution}
+
+\subsubsection{Problem 3}
+In the game Ballmania, you are given a holy urn with \(n\) balls \(b_1, \dots, b_n\), labeled by \(1, \dots, n\) respectively. Initially, the weights of the balls are all one (i.e., \(w_i = 1\) for all \(i\)). In each round, you pick a ball, where the probability of picking the \(i\)th ball \(b_i\) is \(w_i / \sum_j w_j\). If you pick the ball \(b_i\), then its weight becomes \(w_i \leftarrow w_i + 1\). The game then continues to the next round, with updated weights.
+
+Prove upper and lower bounds, as tight as possible (ignoring constants), on the number of rounds till all the \(n\) balls in the urn are encountered, and this happens with probability at least half.
+
+%Hint: What is the probability of a ball that was not picked yet, to be picked in the ith round?
+
+\begin{solution}{Eliot Robson}
+    %Weight is n + t at time t. Coupon problem. Upper bound with 1 - x <= e^{-x}
+    
+    %Balls not encountered have weight 1. Consider epoch from weight w to 2w. Probability ball not encountered in epoch is a constant. Can argue WHP in an epoch, you don't pick more than a constant fraction of missing balls.
+    
+    
+    Let \(X\) be the random variable denoting the number of rounds until all \(n\) balls in the urn are encountered.
+    
+    We will show an upper bound first. Precisely, we want to find some \(\alpha\) such that \(\Prob{X < \alpha} \geq \frac{1}{2}\). To do this, consider the event that some ball \(i \in [n]\) has not yet been selected by the start of round \(t\). Since the total weight of the balls in each round increases by 1, we know that the sum of all weights in the urn at the start of round \(k\) is \(n + k - 1\). Thus, the probability that ball \(i\) is not selected at round \(k\) (conditioned on not being selected in any previous round as well) is \(\del{1 - \frac{1}{n + k - 1}}\). Therefore the probability ball \(i\) is not selected through the start of round \(t\) is 
+    \[
+        \prod_{i = 0}^{t-1} \del{1 - \frac{1}{n + i}}
+        =%
+        \prod_{i = 0}^{t-1} \del{\frac{n + i - 1}{n + i}}
+        =%
+        \frac{n - 1}{n + t - 1}.
+    \]
+    Using this bound and a union bound over every ball, we have that
+    \[
+        \Prob{X \geq t}
+        \leq
+        \sum_{i=1}^{n} \Prob{\text{Ball \(i\) has been unselected by round \(t\)}}
+        =
+        n \cdot \del{\frac{n - 1}{n + t - 1}}.
+    \]
+    Thus, setting \(t = O(n^2)\) and using that \(1 - \Prob{X \geq t} = \Prob{X < t}\) we obtain that \(\Prob{X < O(n^2)} \geq \frac{1}{2}\).
+\end{solution}
+
+\subsubsection{Problem 4}
+Suppose we are given an embedding \(\Gamma\) of a planar graph \(G\) with \(n\) vertices and with each edge drawn as a horizontal or vertical line segment (without edge crossings), and every vertex is placed at a grind point. We want a redrawing \(\Gamma'\) such that every edge is still drawn as a horizontal or vertical line segment, but with unchanged face structure and unchanged \(y\)-coordinates of each vertex, but with (possibly) different \(x\)-coordinates. Call such a redrawing \(\Gamma'\) a \emph{horizontal compaction} of \(\Gamma\).
+
+\begin{enumerate}
+    \item Describe an efficient algorithm to compute a horizontal compaction that minimizes the width of \(\Gamma'\) (difference between min and max \(x\)-coordinates).
+    
+    \begin{sketch}{Eliot Robson}
+        Define a graph whose nodes are each a valid placement of (a subset of the) points of \(G\) and where a directed edge between two nodes has weight 1 if it expands the maximum width of the points placed so far. Then, run a Dijkstra-esque max-weight path algorithm where you traverse all edges of weight 0 adjacent to the frontier before you must take an edge of weight 1.
+    \end{sketch}
+
+    \item Describe an efficient algorithm to compute a horizontal compaction that minimizes the sum of the lengths of the horizontal edges. You should reduce the problem to minimum-cost flow or linear programming.
+    
+    \begin{sketch}{Shubhang Kulkarni, Eliot Robson}
+        Use a graph construction similar to the previous part but assign cost 1 to each edge by the length of the horizontal edge added. Then connect all nodes representing final states to a sink vertex and run min-cost flow.
+    \end{sketch}
+\end{enumerate}
+
+\subsection{Complexity}
+
+\subsubsection{Problem 1}
+Let \(L\) be an arbitrary regular language over the alphabet \(\Sigma = \set{0,1}\), and let \(X \subseteq \Naturals\) be an \textit{arbitrary} set of non-negative integers. Prove that the language \(L^X = \set{w \in \Sigma^* \mid w^n \in L \text{ for some } n \in X}\) is regular.
+
+\begin{scribed}{James Hulett}{Eliot Robson}
+    Let \(m\) be the number of states in some DFA \(M\) deciding \(L\). Then for some \(i > m\) such that \(w^i \in L\), it must be that \(w^{i + m!} \in L\) because the DFA must cycle around somewhere, and the cycle length must divide \(m!\). Thus, instead of \(X\), it suffices to consider the set \(X' \subseteq \set{0, 1, \dots, m! + m}\). Then, for each element \(k \in X'\), we can create a product DFA where states are a \(k\)-tuple which checks if \(w^k \in L\), then use non-determinism to guess which value of \(k\) causes the DFA to accept.
+\end{scribed}
+
+\subsubsection{Problem 3 (Arora-Barak, Exercise 2.32)}
+A language \(L \subseteq \set{0,1}^*\) is \textit{unary} if \(L\) only contains strings with no zeros, that is, \(L \subseteq \set{1}^* = \set{\lambda, 1, 1^2, \dots, 1^n, \dots}\) (where \(\lambda\) denotes the empty string). Prove that if every unary language in \(\NP\) is also in \(\Pe\), then \(\EXP = \NEXP\).
+
+\begin{solution}{Eliot Robson}
+    To solve this problem, we use a careful application of the ``padding trick''. Consider an arbitrary language \(L \in \NEXP\) and the NDTM \(M\) deciding it in \(2^{n^c}\) time. Let \(u : \set{0,1}^* \to \set{1}^*\) be a function which maps a binary string \(x\) representing \(k \in \Naturals\) to \(u(x) = 1^k\). Then, define the language \(L_{pad} = \set{\inp{u(x), 1^{2^{\abs{x}^c}}} \mid x \in L}\).
+    
+    The language \(L_{pad}\) is all the strings \(x \in L\) encoded as unary instead of binary, with zeros padded at the end so that all the elements of the language \(L_{pad}\) are at least exponential in size. We then proceed similar to Theorem 2.22 from the text.
+    
+    Our new language \(L_{pad}\) can be decided by the following NDTM: Given some string \(y\), check if there is some string \(z\) such that \(y = \inp{u(z), 1^{2^{\abs{z}^c}}}\), rejecting immediately if there is no such string. Otherwise, simulate \(M\) on \(z\) for \(2^{\abs{z}^{c+1}}\) many steps and output the answer. To see that this runtime is polynomial in \(y\), observe that mapping a string \(z \to \inp{u(z), 1^{2^{\abs{z}^c}}}\) is injective, and thus invertible in polynomial time by treating \(z\) as an integer and solving for it. The overall runtime is then polynomial in \(\abs{y}\) because we simulate \(M\) on \(z\) for only \(2^{\abs{z}^{c+1}}\) many steps.    
+    
+    Thus, \(L_{pad}\) is a unary language in \(\NP\), and so by assumption, \(L_{pad} \in \Pe\). Then, to decide if some string \(z\) is in \(L\), we simply write it as \(\inp{u(z), 1^{2^{\abs{z}^c}}}\) and give it as input to the machine witnessing \(L_{pad} \in \Pe\) and output the result. Therefore, \(L \in \EXP\) as desired.
+\end{solution}
+
+\subsubsection{Problem 4 (Sipser 8.20)}
+Let \(\MULT = \set{a \# b \# c \mid a,b,c \text{ are binary natural numbers, } a \times b = c}\). Show that \(\MULT \in \Le\).
+
+\begin{solution}{Eliot Robson}
+    To show this, we will produce a logspace TM \(M\) for \(\MULT\). The TM \(M\) will proceed in two stages, using the grade-school multiplication algorithm between \(a\) and \(b\), computing one bit of the product \(a \times b\) at a time and checking whether that bit is equal to the corresponding bit in \(c\).
+    
+    To start, let \(b_i\) be the \(i\)th bit of \(b\), so \(b = \sum_{i=1} b_i \cdot 2^{i-1}\). Our TM \(M\) first represents the products \(a \times (b_i \cdot 2^{i-1})\) for every \(i\). If \(b_i = 0\), than the product is simply 0, and if \(b_i = 1\), the product is just \(a\) bit shifted to the right by \(i-1\). Since both \(a\) and \(b\) are written down on the input tape and can be read from freely, we can simply compute each product on the fly by keeping a counter \(i\) representing which bit of \(b\) we are reading. Since \(i\) takes \(O(\log n)\) bits in the worst case, this step can clearly be done in logspace.
+    
+    Next, \(M\) will sum up the \(j\)th bit of each product \(a \times (b_i \cdot 2^{i-1})\) (which is the \(j\)th bit of \(a \times b\)) and check this value against the \(j\)th bit of \(c\). As stated earlier, the value of the \(j\)th bit of each product can be read on the fly, so in the worst case, the sum of all the \(j\)th bits is \(n\), as \(b\) is an \(n\) bit number. When we move from computing the \(j\)th bit to the \((j+1)\)th bit, the value of our counter is divided by two (since the lowest order bit is the \(j\)th bit, and was previously recorded), with the rest of the counter being the carry bits. The value of this counter is always at most \(2n\), as in each iteration we add at most \(n\) to it's value and then divide by 2, meaning it can always be represented by \(O(\log n)\) bits. Therefore, this step can be performed in logspace as well.
+    
+    Thus, \(M\) as defined computes the product \(a \times b\) one bit at a time, checking whether each output bit is equal to the corresponding bit in \(c\), rejecting if the computed bit is ever unequal and accepting otherwise. By this, \(M\) decides \(\MULT\) and so \(\MULT \in \Le\).
+\end{solution}
+
+
+\section{Spring 2019}
+
+\subsection{Algorithms}
+
+\subsubsection{Problem 1: Color Collector}
+
+Let \(G = (V,E)\) be a directed graph, \(R, B \subset V\) be two disjoint, non-empty subsets of nodes. For a walk \(W\) in \(G\), let \(r_W\) be the number of times a red node is visited in \(W\), and \(b_W\) be the number of times a blue node is visited in \(W\). We say that the graph \(G\) is \emph{interesting} if, for any \(i,j \geq 0\), there is a walk \(W\) in \(G\) such that \(r_W \geq i\) and \(b_W \geq j\). In other words, \(G\) has walks that visit red and blue vertices infinitely often.
+
+\begin{enumerate}
+	\item Describe an efficient (poly-time) algorithm that, given \(G, R, B\) checks whether it is interesting. 
+	
+	\begin{solution}{Eliot Robson}
+		It is easy to see that \(G\) is interesting iff there is a strongly connected component (with size \(> 1\)) that contains at least one red node, and then a descendant strongly connected component contains at least one blue node (again with size \(> 1\)), or vice versa.
+		
+		We start with some definitions. Let \(G_{SCC}\) be the meta-graph of strongly connected components of \(G\). Let \(V_R \subset V_{SCC}\) be a subset of vertices of \(G_{SCC}\) that correspond to strongly connected components with at least one red vertex and at least two total vertices. Define \(V_B \subset V_{SCC}\) similarly for blue vertices.
+		
+		Our algorithm is as follows. First, output YES if \(V_A \cap V_B \neq \emptyset\) (so there's a strongly connected component with at least one red and blue vertex). Otherwise, for each \(v_R \in V_R\), check if any \(v_B \in V_B\) is a descendant using WFS and output YES if this is the case. Then do the same for each \(v_B \in V_B\) checking if any \(v_A \in V_A\) is a descendant. If the algorithm is still running at this point, output NO.
+		
+		It is easy to see this is correct, as this strongly connected component structure our algorithm checks for allow for constructing walks that visit red and blue vertices infinitely often. Otherwise, if there is a graph \(G\) that is interesting, a walk \(W\) visiting red and blue vertices an unbounded number of times must imply either a strongly connected component with both red and blue vertices, or two separate strongly connected components with the structure our algorithm checks for.
+		
+		Computing the SCC graph can be done in \(O(m)\) time, and the WFS search is done at most \(O(n)\) times (for each vertex in \(V_A\) and \(V_B\)) and each search takes \(O(m)\) time. Thus, the overall algorithm runs in \(O(nm)\) time. 
+	\end{solution}
+
+	\item A graph is \emph{fascinating} if, for any integer \(u \geq 1\), there is a walk \(w_1, \dots, w_t\) in \(G\) such that it has a color alternating subsequence of length at least \(u\). Describe an example of a graph that is interesting but not fascinating.
+    
+    \begin{solution}{Eliot Robson}
+        Consider the graph with nodes \(\set{r_1, r_2, b_1, b_2}\) where \(R = \set{r_1, r_2}\) and \(B = \set{b_1, b_2}\). This graph has edges for the 2-cycle between \(r_1\) and \(r_2\), and similarly for \(b_1\) and \(b_2\), and the edge \(r_2 \to b_1\). This graph is interesting, as we can visit the vertices \(r_1\) and \(r_2\) an arbitrary number of times before moving to the blue cycle and visit \(b_1\) and \(b_2\) an arbitrary number of times. However, it is not fascinating, as there are no walks with more than one color alternation.
+    \end{solution}
+	
+	\item Consider the setting where \(G\) has \(k\) colors \(C_1, \dots, C_k\) (non-empty and disjoint). \(G\) is now interesting if there is a walk that visits all nodes in call colors infinitely often. Describe an algorithm for any fixed \(k\) checks whether \(G\) is interesting.
+	
+	\begin{sketch}{Eliot Robson}
+		The algorithm proceeds similar to the previous one. In the graph \(G_{SCC}\), for each node \(v_{SCC} \in V_{SCC}\) which does not correspond to a singleton vertex, let \(S(v_{SCC}) \subseteq [k]\) be the set of colors represented in \(v_{SCC}\). The goal of our algorithm is to find a path in \(G_{SCC}\) in which all colors are represented (where we define \(S(v_{SCC}) = \emptyset\) if \(v_{SCC}\) represents a singleton vertex).
+		
+		To do this, we simply need to use a DP going from each sink vertex back to each source, tracking which possible subsets of colors are reachable from a path starting from each given vertex. This DP takes time \(O(n 2^k)\), as we need to store subsets of colors reachable from each vertex.
+	\end{sketch}
+\end{enumerate}
+
+\subsubsection{Problem 2: Rainbow Flow}
+Let \(G = (V,E)\) be a graph with integer capacities edge-capacities \(c(e), e \in E\) and let \(s,t \in V\) be source and sink nodes. Suppose some of the edges are colored red, some colored blue, and the rest uncolored. Let \(R, B \subset E\) be the (disjoint) sets of red and blue edges respectively. Let \(k_r\) and \(k_b\) be non-negative integers and let \(\mathcal{P}\) be the set of all \(s\)-\(t\) paths in \(G\) with at most \(k_r\) red edges and \(k_b\) blue edges. We are interested in a maximum \(s\)-\(t\) flow where the flow is non-zero only on paths from \(\mathcal{P}\). More formally, we want to maximize \(\sum_{p \in \mathcal{P}} f(p)\) subject to the usual constraint that the total flow on each edge is at most \(c(e)\) (where \(f(p)\) is the amount of flow on path \(p\)).
+
+\begin{enumerate}
+    \item Write down the formal LP for the problem.
+    
+    \begin{solution}{Eliot Robson}
+        \begin{maxi*}|s|
+            {}{\sum_{p \in \mathcal{P}} f(p)}{}{}%objective
+            \addConstraint{\sum_{p \in \mathcal{P} : e \in p} f(p)}{\leq c(e),}{\quad \forall e \in E}
+            \addConstraint{f(p)}{\geq 0}{\quad \forall p \in \mathcal{P}}
+        \end{maxi*}
+    \end{solution}
+    
+    \item Argue why the LP has an optimum solution that can be written in space that is polynomial in the graph size even though the number of variables is potentially exponential.
+    
+    \begin{solution}{Eliot Robson}
+    	This LP can be written in polynomial space by recording the amount of flow on each individual edge.
+    \end{solution}
+    
+    \item Write the dual of the LP.
+    
+    \begin{solution}{Eliot Robson}
+    	\begin{mini*}|s|
+    		{}{\sum_{e \in E} y(e)}{}{}%objective
+    		\addConstraint{\sum_{e \in p} y(e)}{\geq 1,}{\quad \forall p \in \mathcal{P}}
+    		\addConstraint{y(e)}{\geq 0}{\quad \forall e \in E}
+    	\end{mini*}
+    \end{solution}
+    
+    \item Describe a polynomial-time separation oracle for the dual LP.
+    
+    \begin{solution}{Eliot Robson}
+    	We simply need to check if there is a path from \(s\) to \(t\) in the residual graph using at most \(k_r\) red and \(k_b\) blue edges (graph with original capacities minus the ones in the current dual solution).
+    \end{solution}
+\end{enumerate}
+
+\subsubsection{Problem 3: Making Strong Connected Components Faster}
+%Based on https://jeffe.cs.illinois.edu/teaching/algorithms/book/06-dfs.pdf
+
+\begin{enumerate}
+    \item Let \(G\) be a directed graph with \(n\) vertices and \(m\) edges. Consider any DFS of \(G\). Prove that the last vertex in any DFS postordering of \(G\) lies in a source strong connected component of \(G\).
+    
+    \begin{solution}{Eliot Robson}
+        Fix a depth-first traversal of \(G\) with last vertex \(v\) in the resulting postordering. Then \(DFS(v)\) must be the last direct call to DFS made by the wrapper algorithm DFSAll.
+    \end{solution}
+
+    \item Using the above, sketch an algorithm with running time \(O(n + m)\) for computing the strong connected components of \(G\).
+    
+    %TODO Just copy the high level approach from Jeff's textbook (he clearly wrote this question)
+    \begin{solution}{Eliot Robson}
+        We first compute the DFS postordering of \(G\). By the previous lemma, we know that the last vertex in this postordering must be part of a source strongly connected component. 
+    \end{solution}
+
+    \item Assume we are given a data structure that can maintain under insertion and deletion a set of vertices \(X \subseteq V(G)\), such that given a query vertex \(u\), the data structure reports a single edge from \(u\) to a vertex in \(X\) in \(G\) (if it exists, reporting an arbitrary edge if there are multiple). The data structure also supports reverse queries, where given \(u\), it reports an edge from a vertex of \(X\) to \(u\) (if one exists).
+    
+    Assume that insertion, deletion, query, and reverse query operations all take \(O(\log n)\) time. Describe an algorithm with near linear running time (i.e.\ \(O(n \polylog n)\)) that computes all the strong connected components of \(G\).
+    
+    \begin{solution}{Eliot Robson}
+        At a high level, our algorithm will build up each strongly connected component by performing a DFS, where we will use the given data structure to explore new vertices instead of looking through an explicit edge list for each vertex. Suppose the vertices are (arbitrarily) labeled \(v_1, \dots, v_n\) and our DFS starts at \(v_1\). We will keep a copy of the given data structure holding the unvisited vertices thus far, and a copy for the current strongly connected component we are assembling.
+        
+        We start by loading one copy of the data structure \(R\) with the vertices \(V - v_1\) and one copy \(C\) that starts off empty. As we are implementing DFS, we will keep a stack \(S\) containing all of the vertices we have visited in order, where we will call the top vertex the ``active'' vertex. The data structure \(C\) will contain all non-active vertices we have visited so far, and will be our way of keeping track of back edges. At the start of the algorithm, we load \(v_1\) into \(S\) and query \(R\) for any edge from \(v_1\) to \(R\).
+        
+        If there is no such edge, we remove \(v_1\) from \(S\) and mark this as one strongly connected component. Otherwise, if the data structure \(R\) reports the edge \(v_1 \to v_i\), we remove \(v_i\) from \(R\), insert \(v_1\) into \(C\), and insert \(v_i\) at the top of \(S\). Then the vertex \(v_i\) is then active. We then query \(C\) whether \(v_i\) has any edges going into \(C\). If \(C\) reports the edge \(v_i \to v_j\) where \(v_j \in C\), we then remove vertices from the stack until we reach \(v_j\), and then mark these removed vertices as part of the connected component that \(v_j\) is in (in other words, we have found a cycle and we contract it). We put these marked vertices into their own data structure. 
+        
+        %TODO check if this is the right approach.
+    \end{solution}
+\end{enumerate}
+
+\subsubsection{Problem 4: Green Bits and Hamming Distance}
+For two strings \(x = a_1 \dots a_n \in \Sigma^*\) and \(y = b_1 \dots b_n \in \Sigma^*\), the \emph{Hamming distance} \(d_H (x,y)\) is defined as the number of positions \(i\) such that \(a_i \neq b_i\).
+
+\begin{enumerate}
+	\item Pick a random function \(h : \Sigma \to [k]\) for a given integer \(k\). For two strings \(x = a_1 \dots a_n \in \Sigma^*\) and \(y = b_1 \dots b_n \in \Sigma^*\), define new strings \(h(x) = h(a_1) \dots h(a_n) \in [k]^*\) and \(h(y) = h(b_1) \dots h(b_n) \in [k]^*\). For a fixed pair of strings \(x\) and \(y\) and a random \(h\), prove that the probability that \(d_H(h(x), h(y)) \geq (1 - 2/k) d_H(x, y)\) is at least \(1/2\).
+	
+	\begin{solution}{Eliot Robson}
+		Our approach will be to compute the expected contribution to the Hamming distance contributed by a single character, and then apply linearity of expectation over the pair of strings and Markov's inequality. For some characters \(a, b \in \Sigma\) such that \(a \neq b\), using that \(h\) is a random function we have that \(\Prob{h(a) = h(b)} = \frac{1}{k}\).
+		
+		Applying linearity, we see that 
+		\begin{align*}
+			\Exp{d_H(x, y) - d_H (h(x), h(y))}
+			&=%
+			\sum_{i : a_i \neq b_i} 1 - \Prob{h(a_i) \neq h(b_i)}\\
+			&=%
+			\sum_{i : a_i \neq b_i} \Prob{h(a_i) = h(b_i)}\\
+			&=%
+			\frac{1}{k} d_H(x,y).
+		\end{align*}
+		Finally, we apply Markov's inequality and rearrange to obtain that
+		\begin{align*}
+			\Prob{d_H (h(x), h(y)) < (1 - 2/k) d_H(x, y)}
+			&=%
+			\Prob{d_H (x,y) - d_H (h(x), h(y)) > (2/k) d_H (x,y)}\\
+			&\leq%
+			\frac{\Exp{d_H (x,y) - d_H (h(x), h(y))}}{(2/k) d_H (x,y)}\\
+			&=%
+			\frac{d_H(x,y) / k}{(2/k) d_H (x,y)}\\
+			&=%
+			\frac{1}{2},\\
+			\implies
+			\Prob{d_H (h(x), h(y)) \geq (1 - 2/k) d_H(x, y)}
+			&=%
+			1 - \Prob{d_H (h(x), h(y)) < (1 - 2/k) d_H(x, y)}\\
+			&\geq%
+			1 - \frac{1}{2}\\
+			&=%
+			\frac{1}{2},
+		\end{align*}
+		which is the desired lower bound.
+	\end{solution}
+
+	\item In the \emph{all-pairs Hamming distance} problem, we are given a set \(S\) of \(n\) length-\(n\) strings over a finite alphabet \(\Sigma\), and we want to compute the Hamming distance \(d_H (x,y)\) for all pairs of strings \(x,y \in S\). It is known that this problem can be solved exactly in \(O(\abs{\Sigma} n^{2.373})\) time. Using this result as a subroutine, describe a randomized approximation algorithm which computes a \((1 - \epsilon)\)-factor approximation to \(d_H(x,y)\) for all pairs \(x,y \in S\) in \(O(\epsilon^{-1} n^{2.373} \log n)\) time. The error probability of your algorithm should be at most \(1 / n^c\) for an arbitrarily large constant \(c\).
+	
+	\begin{solution}{Eliot Robson}
+		First, choose some \(k\) such that \(\frac{2}{k} < \epsilon\), and then choose a random function \(h : \Sigma \to [k]\) as in part 1. Then run the given all-pairs Hamming distance on the set of strings \(h(S) = \set{h(x)}_{x \in S}\). We then repeat this process independently \(m = O(\log n)\) times and, for each pair \(x,y \in S\), we report the maximum of the distances \(d_H(h(x), h(y))\) over all runs to achieve the desired error bounds.
+		
+		We first examine the error probability for a single pair of strings \(x, y \in S\). For one run of the algorithm, the probability that \(d_H (h(x), h(y))\) fails to be a \((1 - \epsilon)\)-factor approximation is \(\leq 1/2\) by part 1. Thus the probability that \(m\) independent runs of the algorithm all fail to be a \((1 - \epsilon)\)-approximation for the pair \(x,y\) is at most \(2^{-m} = n^{-c-2}\) for \(m\) chosen appropriately. Thus, union bounding over every pair \(x,y \in S\), the probability that the reported final answer for any pair fails to be a \((1 - \epsilon)\)-approximation is at most \(\sum_{x,y \in S} 2^{-m} \leq n^{2} \cdot n^{-c - 2} = n^{-c}\) for any constant \(c\), which is the desired error bound.
+		
+		Finally, we examine the runtime of this algorithm. As we are using an alphabet of size \(k\) in each independent run of the given subroutine, each execution of the subroutine runs in time \(O(k n^{2.373}) = O(\epsilon^{-1} n^{2.373})\) by the choice of \(k\). Since we execute this subroutine independently \(m = O(\log n)\) times, and generating the random function \(h\) can be done in \(O(k)\) time, the overall runtime of our algorithm is \(O(\epsilon^{-1} n^{2.373} \log n)\).
+	\end{solution}
+\end{enumerate}
+
+
+\subsection{Complexity}
+
+\subsubsection{Problem 1: It is a long way to get accepted}
+
+\begin{enumerate}
+	\item Given \(k\) DFAs \(M_1, \dots, M_k\) each of at most \(n\) states, show that if the intersection of their \(k\) corresponding languages \(L = \bigcap_{i=1}^{k} L(M_i)\) is nonempty, then \(L\) must contain a string of length at most \(n^{k}\).
+	
+	\begin{solution}{Eliot Robson}
+		Consider the DFA \(M\) which accepts the language \(L\) created by using the standard product construction of the DFAs \(M_1, \dots, M_k\). Since each component DFA has at most \(n\) states, then the DFA \(M\) has at most \(n^k\) states (as each state in the product DFA is a tuple of states from each of the component DFAs). Thus, if \(L\) is nonempty, then there is at least one string accepted by \(M\), meaning that there is some walk from the start state to an accepting state in \(M\) (treating \(M\) as a graph). Thus, even in the worst case, there must be a path of length \(\leq n^k\) from the start state to the accept state in \(M\). Taking the string corresponding to the edges taken in this path gives the desired string in the language.
+	\end{solution}
+	
+	\item Prove that the following problem is in \(\PSPACE\): Given an integer \(k\) and \(k\) DFAs \(M_1, \dots, M_k\), decide whether or not \(L(M_1) \cap \dots \cap L(M_k)\) is empty.
+    
+    \begin{solution}{Eliot Robson}
+        %Cite Savitch's theorem directly. Can do graph reachability in O(k log^2 n) space directly.
+        Recall that Savitch's theorem states that \(\PSPACE = \NPSPACE\), so it suffices to show the above problem can be solved in \(\NPSPACE\). The main problem to overcome is that the string of length at most \(n^k\) in \(L\) (if \(L\) is nonempty), so we cannot simply write down the string and simulate it on each component DFA. Instead, we have an NDTM guess one character at a time (which can be written on the work tape) and then simulate the reading of this character on each DFA for one step, and keeping a counter for the number of characters that have been read so far. This NDTM guesses characters and simulates their reading on each DFA, accepting if all the DFAs are in an accepting configuration, and rejects if the counter ever reaches \(n^k\) (which from part 1, a non-empty \(L\) must contain a string of at most this length).
+        
+        Thus, this NDTM only requires the space needed to simulate the execution of each input DFA (which is polynomial in the input, as this only requires storing which state each DFA is currently at), the space to store an individual input symbol, and the space to store a counter counting up to \(n^k\). Thus, this problem is in \(\NPSPACE\) as desired.
+    \end{solution}
+\end{enumerate}
+
+\subsubsection{Problem 2 (Arora-Barak, Exercise 6.8)}
+A language \(S \subseteq \set{0,1}^*\) is \emph{sparse} if there is some polynomial \(p(n)\) such that, for all \(n \geq 0\) that \(S \cap \set{0,1}^n \leq p(n)\). For a language \(L\), show that \(L \in \Pe / \poly\) iff \(L \in \Pe^S\) for some sparse language.
+
+\begin{solution}{Eliot Robson}
+    \hfill\\
+    \((\Longrightarrow)\)\\
+    Take some \(L \in \Pe/\poly\). Then, there is a TM which on input \(x\), also takes in the advice string \(\alpha_n \in \set{0,1}^{\alpha(n)}\) for \(n = \abs{x}\) and \(\alpha\) a polynomial. Thus, to show that \(L \in \Pe^{S}\), we will construct a language \(S\) such that a TM in \(\Pe^{S}\) can guess the advice string \(\alpha_n\) given to \(M\) in polynomial time. With this advice string in hand, the constructed TM can then just mimic the behavior of \(M\).
+    
+    We define 
+    \[
+        S = \set{1^n \# p \mid \text{\(p\) is a prefix of \(\alpha_n\)}}.
+    \]
+    Observe that, for each length \(m\), there are at most linearly many strings of length \(m\) in \(S\), and so \(S\) is sparse. Given an oracle for \(S\) and an input \(x\) of length \(n\), we construct a TM \(M\) as follows. To compute \(\alpha_n\), \(M\) first queries the oracle for \(S\) with \(1^n \# 0\) and \(1^n \# 1\). Only one of these can be in \(S\), and so let \(b \in \set{0,1}\) be such that \(1^n \# b \in S\). \(M\) then queries the oracle with \(1^n \# b 0\) and \(1^n \# b 1\), continuing on depending on which string is in \(S\). \(M\) repeats this process until all of \(\alpha_n\) is computed, at which point \(M\) simply executes the same behavior as the TM in \(\Pe / \poly\) deciding \(L\). Both of theses steps run in polynomial time, thus showing that \(L \in \Pe^{S}\).
+    
+    \((\Longleftarrow)\)\\
+    Take some \(L \in \Pe^{S}\). For an input \(x\) where \(\abs{x} = n\), the longest string that a TM \(M\) deciding \(L\) can query the oracle for \(S\) must be polynomially bounded in \(n\) (as the TM runs in polynomial time). Let this polynomial be \(n^d\) for some constant \(d\). Then, for a given length \(n\), there are at most \(n^c\) strings of length \(n\) in \(S\) for some constant \(c\). Thus, there are at most \(n^{cd}\) many strings that could be queried by \(M\). To simulate \(M\) with a TM \(M'\) in \(\Pe / \poly\), we simply let the advice string \(\alpha_n\) be all possible strings in \(S\) which could be queried by \(M\), which by the previous discussion, is polynomially bounded in \(n\). Therefore, whenever \(M\) would query the oracle for \(S\), \(M'\) will look through its given advice string \(\alpha_n\) for the query string, returning yes if it is found. This query simulation can be performed in polynomial time, so \(M'\) runs in polynomial time.
+\end{solution}
+
+\subsubsection{Problem 3 (Arora-Barak, Exercise 8.1)}
+Recall the model of interactive proofs, where a computationally unbounded prover \(P\) interacts with a polynomial-time probabilistic verifier \(V\). Consider the complexity class of languages with efficient interactive proofs where we consider different completeness and soundness parameters. That is, define \(\IP{c,s}\) to be those languages \(L\) where
+
+\begin{align*}
+    x \in L
+    &\implies
+    \exists P, \; \Prob{(P \leftrightarrow V)(x) \text{ accepts}}[V] \geq c\\
+    x \notin L
+    &\implies
+    \forall P, \; \Prob{(P \leftrightarrow V)(x) \text{ accepts}}[V] \leq s
+\end{align*}
+
+The standard definition of the complexity class of interactive proofs is given by \(\IP{} \coloneqq \IP{\frac{2}{3}, \frac{1}{3}}\).
+
+\begin{enumerate}
+    \item Give a direct proof that \(\IP{\frac{2}{3}, \frac{1}{3}} = \IP{1 - \frac{1}{2^n}, \frac{1}{2^n}}\), where \(n = \abs{x}\).
+    
+    \begin{solution}{Eliot Robson}
+        The backward inclusion is trivial. For the forward inclusion, we simply repeat the rounds of verification (independently) until we achieve the desired concentration. Specifically, we accept if the verifier accepts at least \(1/2\) of the time, rejecting otherwise. With \(\Omega(n)\) independent runs of the verifier, the probability that the verifier accepts is at least \(1 - \frac{1}{2^n}\) by the Chernoff bound, and similarly, the probability it rejects is at most \(\frac{1}{2^n}\).
+    \end{solution}
+    
+    \item Prove that \(\IP{\frac{2}{3}, \frac{1}{3}} = \IP{1, \frac{1}{3}}\).
+    
+    \begin{solution}{Eliot Robson}
+        Recall that \(\IP{} = \PSPACE\) and that the proof system for showing \(\TQBF \in \IP{}\)  has perfect completeness (the verifier always accepts with probability 1). Thus, every language in \(\IP{}\) can be reduced to \(\TQBF\), so we obtain a proof system with perfect completeness by, for every input asking if \(x\) is in some language \(L\), we reduce \(x\) to an instance of \(\TQBF\) and use the proof system for \(\TQBF\).
+    \end{solution}
+    
+    \item Prove that \(\IP{\frac{1}{2} + \frac{1}{2^n}, \frac{1}{2}} = \IP{\frac{2}{3}, \frac{1}{3}}\)
+\end{enumerate}
+
+\subsubsection{Problem 4}
+\(k \UP\) problems are problems solvable in \(\NP\) by a machine that has at most \(k\) accepting computations on any input. We will denote \(1 \UP\) as simply \(\UP\). It is clear that \(\Pe \subseteq k \UP \subseteq (k + 1) \UP\) for each \(k\), but it is not known if the hierarchy is strict. Prove that \(\Pe = \UP\) iff \(\Pe = 2 \UP\).
+
+\begin{solution}{Eliot Robson}
+    By the initial discussion, the backward implication is obvious. For the forward implication, take some language \(L \in 2 \UP\) decided by corresponding NDTM \(M\). By the definition of \(2 \UP\), \(M\) only accepts an input \(x\) if there are at most two certificates \(u\) such that \(M(x,u)\) accepts. Two cases are then possible. If there is only one possible certificate \(u\) such that \(M(x,u)\) accepts, then an NDTM simulating \(M\) with the input \(x\) hardcoded (but still taking a certificate) is in \(\UP\), and so it is in \(\Pe\) by assumption. Otherwise, we modify the TM \(M\) to require two different certificates \(u, u'\) (checking they are distinct) such that \(M(x, u) = M(x, u') = 1\). This modified TM is in \(\UP\) because it only has one accepting computation, and then by assumption, it is in \(\Pe\) as well. Thus, to decide if a given input \(x\) is in \(L\), we simply run both of these procedures, accepting if either accepts, rejecting otherwise. As this procedure runs in polynomial time, then \(L \in \Pe\) showing that \(\Pe = 2 \UP\) as desired.
+    
+    %TODO check if this is right? Kinda dubious of my answer here.
+    %Change language such that, instead of asking for one certificate, ask for two. Then, verify both certificates are different. This shows that something in 2UP is decidable by UP, then the inclusions show that it's equal to P.
+\end{solution}
+
+
+\section{Fall 2018}
+
+\subsection{Algorithms}
+
+\subsubsection{Problem 1}
+Given a graph \(G = (V,E)\), recall that a subset \(S \subseteq V\) is a \emph{dominating set} in \(G\) if, for all \(u \in V - S\), there is a neighbor \(v\) of \(u\) such that \(v \in S\). Consider the following generalization: For a parameter \(k \geq 1\), a subset \(S \subseteq V\) is a \emph{\(k\)-dominating set} if for all \(u \in V - S\), there are \(k\) distinct neighbors of \(u\) in \(S\). For any fixed constant \(k\), describe a polynomial time algorithm for finding the minimum-cardinality \(k\)-dominating set in a given tree \(T = (V, E_T)\).
+
+\begin{solution}{Eliot Robson}
+    We will then root our tree (arbitrarily) and apply a dynamic programming algorithm. We first outline the following definitions:
+    \begin{enumerate}
+        \item A \emph{type-0} \(k\)-dominating set is one which is completely dominated.
+        \item A \emph{type-1} \(k\)-dominating set is one which is completely dominated and the root \(r \in S\).
+        \item A \emph{type-2} \(k\)-dominating set is one which is completely dominated except the root \(r\) has 1 remaining demand.
+    \end{enumerate}
+	Thus, we obtain the following recurrences and base cases:
+	\begin{align*}
+		\OPT_0 (r)
+        &=%
+        \min
+        \begin{cases}
+            1 + \sum_{v \in N(r)} \OPT_2(v)\\
+            \min_{v_1, \dots, v_k \in N(r)} \del{\sum_{i=1}^{k} \OPT_1 (v_i) + \sum_{u \in N(r) \setminus \set{v_1, \dots, v_k}} \OPT_0 (u) }
+        \end{cases}\\
+        \OPT_1 (r)
+        &=%
+        1 + \sum_{v \in N(r)} \OPT_2 (v)\\
+        \OPT_2 (r)
+        &=%
+        \min
+        \begin{cases}
+            1 + \sum_{v \in N(r)} \OPT_2 (v)\\
+            \min_{v \in N(r)}
+            \del{\OPT_1 (v) + \sum_{u \in N(r) \setminus \set{v}} \OPT_0 (u) }
+        \end{cases} 
+	\end{align*}
+    Each value of \(\OPT_0\) can be computed in \(O(n^k)\) time from previous values (which is polynomial when \(k\) is a fixed constant), and the values of \(\OPT_1\) and \(\OPT_2\) can be computed more quickly. Thus, the above DP runs in polynomial time. The final answer is \(\OPT_0(r)\) for the top level root chosen for the graph.
+\end{solution}
+
+\subsubsection{Problem 2}
+
+\subsubsection{Problem 3}
+Let \(G\) be an undirected graph with \(n\) vertices and \(m\) edges that has a vertex cover of size \(k\) (for simplicity, assume that \(k\) is given).
+
+\begin{enumerate}
+    \item Present an algorithm for computing a 2-approximation of the minimum vertex cover of \(G\). What is the running time of your algorithm?
+    
+    \begin{solution}{Eliot Robson}
+        A simple 2-approximation for the minimum vertex cover is to greedily compute a maximal matching by adding edges from \(G\) while there are unmatched endpoints in \(G\), and then return the set of all endpoints of this matching. As this matching is maximal (cannot be made larger), this must be a valid vertex cover. Suppose there is some min vertex cover of size \(k\). Every edge of this matching must be covered by at least one element of the min vertex cover, so the set of endpoints of this matching has size at most \(2k\). Thus, returning this set as our final answer, we obtain the desired 2-approximation.
+        
+        The algorithm has runtime \(O(n + m)\), as we either take the endpoints of every edge into our final answer or discard them, reading each once. 
+    \end{solution}
+
+    \item Provide an algorithm that computes the minimum vertex cover of \(G\) in \(O(2^{2k} (n+m))\) time.
+    
+    \begin{solution}{Eliot Robson}
+        We first run the algorithm from part 1 to obtain the full set of endpoints of the computed matching in \(O(n + m)\), which has size at most \(2k\). We note that this set of endpoints is actually a superset of a min vertex cover, so our algorithm will simply enumerate all subsets of the approximate min vertex cover, returning the minimum subset which is still a valid vertex cover. As we can check that a set of vertices is a valid vertex cover in \(O(n + m)\) time, our overall algorithm runs in time \(O(2^{2k} (n + m))\) as desired.
+    \end{solution}
+
+    \item Prove that any vertex of degree strictly larger than \(k\) must be in the optimal vertex cover.
+    
+    \begin{solution}{Eliot Robson}
+        If we have some vertex \(v\) such that \(\deg(v) > k\), then we know the min vertex cover is smaller than the size of the neighborhood of \(v\). Thus, if \(v\) is not part of some min vertex cover, then this min vertex cover must leave some edge incident to \(v\) uncovered, which is a contradiction. Therefore every edge \(v\) as described must be part of a min vertex cover.
+    \end{solution}
+
+    \item Provide an algorithm that computes the minimum vertex cover of \(G\) in \(O(n + m + 2^{2k} k^c)\) time for some constant \(c\).
+    
+    \begin{solution}{Eliot Robson}
+        As in the previous algorithm, we first compute a vertex set \(S\) of size \(2k\) which is a superset of at least one minimum vertex cover. Then, from \(S\) we remove all vertices of degree strictly greater than \(k\) and include those in our final answer (by the previous lemma). Also, we remove all vertices from \(S\) which are incident to edges with only one endpoint in \(S\) and add them to our final answer (as there is no other vertex in \(S\) which can cover these edges). So we now have a set \(S\) of at most \(2k\) vertices each with degree at most \(k\), and with only internal edges.
+        
+        Thus, the set \(S\) now only has \(O(k^2)\) edges at the most, and so we can check in \(O(k^2)\) whether a subset of \(S\) is a valid vertex cover for its internal edges (as we have already handled the external edges in the previous cases). Thus, by enumerating all \(2^{2k}\) subsets of \(S\), using our preceding observation we can find the min vertex cover for \(S\) in \(O(2^{2k} k^{2})\) time. Combined with our initial processing of the graph, our algorithm runs in time \(O(n + m + 2^{2k} k^2)\) as desired.
+    \end{solution}
+\end{enumerate}
+
+
+% Proof here: https://www.whitman.edu/mathematics/cgt_online/book/section05.07.html
+\subsubsection{Problem 4}
+Let \(G = (V,E)\) be an undirected simple graph (with no self-loops and multiedges). A node \(u \in V\) is a \emph{cut-vertex} of \(G\) if \(G - u\) has at least two non-trivial connected components. We say that \(G\) is a \emph{block} if \(G\) has no cut-vertices. Note that \(K_2\) is a block. \(G\) is a \emph{non-trivial} block if \(\abs{V} \geq 3\)
+
+\begin{enumerate}
+    \item Prove that in any non-trivial block, for any two nodes \(u,v\), there is a cycle that contains \(u\) and \(v\).
+    
+    \begin{solution}{Eliot Robson}
+    	Let \(U\) be the sent of all nodes sharing a cycle with \(u\), and suppose toward contradiction that \(v \notin U\). It is clear that \(U\) is non-empty as we can take a neighbor \(x \in N(u)\), remove the edge \(\set{x,u}\), and the \(G\) will remain connected because it is a block. Then, the path in \(G - \set{x,v}\) with \(\set{x,v}\) must form a cycle.    	
+    	
+    	Then, let \(w\) be the node in \(U\) that is closest to \(v\) such that \(d(w,v) \geq 1\). Additionally, let \(C\) be the cycle containing \(w\) and \(u\), and let \(P_{wv}\) be the path from \(w\) to \(v\) in \(G\). Since \(G\) is a block, there must be a path \(P_{uv}\) in \(G - w\). Let \(x \in P_{uv}\) be the last vertex on the path \(P_{uv}\) which is also in \(C\), and let \(y \in P_{uv}\) be the first vertex on the path \(P_{uv}\) which is also in \(P_{wv}\). Then, if we start from \(u\), proceed along \(C\) to \(x\) (without using \(w\)), then proceed along \(P_{uv}\) from \(x\) to \(y\), then to \(w\) backwards along \(P_{wv}\), and finally along \(C\) from \(w\) back to \(u\), we have that \(y \in U\) as we have constructed a cycle containing \(y\) and \(u\). However, by assumption \(y \neq w\) (as \(y\) is in \(G - w\)), contradicting that \(w\) was the closest vertex in \(U\) to \(v\). Thus \(v \in U\) as desired.    	
+    \end{solution}
+    
+    \item Prove that in any non-trivial block, for any two edges \(e,e'\), there is a cycle that contains \(e\) and \(e'\). %Hint: use (a) on a modified graph
+    
+    \begin{solution}{Eliot Robson}
+        Let \(G'\) be the graph where we subdivide \(e\) with a new vertex \(v_{e}\) and \(e'\) with a new vertex \(v_{e'}\). The new graph \(G'\) is still a block, as the removal of \(v_{e}\), \(v_{e'}\), or any of their neighbors does not disconnect the graph. Then, applying part 1 to \(G'\), there is a cycle containing \(v_{e}\) and \(v_{e'}\). This implies the existence of a cycle in the original graph \(G\) as desired.
+    \end{solution}
+    
+\end{enumerate}
+
+\subsection{Complexity}
+
+\subsubsection{Problem 1}
+A string of the form \(xx\) for some \(x \in \set{0,1}^*\) is called a \emph{square}. Consider the following \textsf{DFA-Accepts-Some-Square} problem: given a DFA \(M\) with \(n\) states over the alphabet \(\set{0,1}\), decide whether \(L(M)\) contains a square.
+
+\begin{enumerate}
+    \item First show that if \(L(M)\) contains a square, it contains a square of length at most \(2n^2\).
+    
+    \begin{solution}{Eliot Robson}
+        Let \(xx \in L(M)\) be the shortest square in \(L(M)\) and let \(q_m\) be the state after reading \(x\) starting from initial state \(q_0\). Consider the pair of states \((q_{i_1}, q_{i_2})\) where \(q_{i_1}\) is the state of the DFA after reading the first \(i\) symbols of \(x\) starting from \(q_0\), and \(q_{i_2}\) is the state of the DFA after reading the first \(i\) symbols of \(x\) starting from \(q_m\).
+        
+        If \(\abs{x} \leq n^2\), we are done, so assume the contrary. Then, there are \(> n^2\) pairs \((q_{i_1}, q_{i_2})\), as there are \(> n^2\) possible values of \(i\). Thus, there must be two values \(i^*, j^* \leq \abs{x}\) such that \((q_{i^*_1}, q_{i^*_2}) = (q_{j^*_1}, q_{j^*_2})\) by pigeonhole principle. Without loss of generality, let \(i^* < j^*\). Let \(x' = x_{j^*+1, \dots, \abs{x}}\) be the suffix of \(x\) read by the DFA to go from \(q_{j^*_2}\) to the state accepting \(xx\). Then, starting from \(q_{j^*_1}\), if the DFA reads \(x'\), then the DFA will be in state \(q_m\).
+        
+        Since \((q_{i^*_1}, q_{i^*_2}) = (q_{j^*_1}, q_{j^*_2})\), the string \(x^* = x_{1, \dots, i^*} x'\) will make the DFA starting from \(q_0\) transition to \(q_m\), and starting from \(q_m\) transition to the state accepting \(xx\). Then, \(x^* x^* \in L(M)\) is a square such that \(\abs{x^* x^*} < \abs{xx}\), contradicting the minimality of \(xx\). Thus, there must be some square of length \(2 n^2\) as desired.
+    \end{solution}
+    
+    \item Show that \(\textsf{DFA-Accepts-Some-Square}\) is in \(\Pe\).
+    
+    \begin{solution}{Eliot Robson}
+        We construct the directed graph \(G = (V,E)\) as follows
+        \begin{align*}
+            V &= Q \times Q\\
+            E &= \set{(q_1, q_2) \to (q_1', q_2') :
+                q_1' = \delta(q_1, a) \text{ and } q_2' = \delta(q_2, a) \text{ for some } a \in \Sigma}.
+        \end{align*}
+        Then, if \(q \in Q\) is an arbitrary state of the DFA, \(q_0\) is the start state, and \(q_A\) is some accepting state, then a path from \((q_0, q)\) to \((q, q_A)\) corresponds to the existence of a square in \(L(M)\) (as edges in \(G\) correspond to \(M\) reading in two of the same character at a pair of stating states). If \(L(M)\) contains a square, then it contains one of length at most \(2n^2\), and in this case there must be a path in \(G\) as described previously of length at most \(n^2\).
+        
+        Thus, this motivates the following algorithm. For every possible \((q_0, q)\), we perform a BFS for distance at most \(n^2+1\), searching for \((q, q_A)\) for any accept state \(q_A \in A\). If we reach this state, we have found a path in \(G\) witnessing that there is a square in \(L(M)\). If all of these BFS' fail, then we simply reject.
+        
+        By our previous discussion, this algorithm will correctly identify whether a square is accepted by \(M\). Each BFS takes \(O(n^2)\) time (as the number of edges is \(\abs{\Sigma} n^2\)), and there are \(n\) possible states for \(q\), so our overall algorithm runs in \(O(n^3)\) time, meaning it is in \(\Pe\).
+    \end{solution}
+    
+\end{enumerate}
+
+%\subsubsection{Problem 2}
+%In this problem, our Turing Machine's (TM) are deterministic 2-tape TM's with a \emph{read-only} input tame and a \emph{read-write} work tape. In each step, the machine reads the current cell of the input and work tapes, and based on the current control state, changes its control state, writes a symbol on the work tape, and moves both input and work tape heads, independently, either left or write. A computation of such a machine is said to be \emph{non-erasing} if, in each step, if a non-blank symbol is read on the work tape then the same symbol is written back. In other words, the only symbols ``changed'' during the computation are the blank symbols on the work tape.
+
+%\textsf{NonErasing} is the following problem: Given a Turing machine \(M\) and input \(w\), answer ``yes'' if \(M\)'s (unique) computation on \(w\) is non-erasing. Prove that \textsf{NonErasing} is not recursively enumerable.
+
+%NOTE: I don't think they're going to ask about this, since we didn't talk about something being recursively enumerable in our semester of complexity.
+
+\subsubsection{Problem 3}
+Consider the following two versions of the ``\(k\)-SUM'' problem:
+
+\begin{enumerate}
+    \item \textsc{Version 1.} Given a set \(S\) of \(n\) elements and a ``target'' number \(t\), where each element is an \(m\)-bit number, do there exist \(k\) distinct elements \(s_1, \dots, s_k \in S\) such that \(s_1 + \dots + s_k = t\)?
+    
+    \item \textsc{Version 2.} Given \(k\) sets \(S_1, \dots, S_k\) with a total of \(n\) elements, and a ``target'' number \(t\), where each element is an \(m\)-bit number, do there exist \(k\) (not necessarily distinct) elements \(s_1 \in S_1, \dots, s_k \in S_k\) such that \(s_1 + \dots + s_k = t\).
+\end{enumerate}
+
+Version 2 clearly reduces to Version 1 (by adding leading bits to the numbers). In this problem, you will give a randomized reduction from Version 1 to Version 2.
+
+\begin{enumerate}
+    \item Given \(k\) elements, suppose that we assign each element with a random color independently chosen from \(\set{1, \dots, k^2}\). Show that the probability that all elements received different colors is at least a positive constant.
+    
+    \begin{solution}{Eliot Robson}
+        If we suppose that each element is assigned its color sequentially, to maintain that all elements have different colors, the first element has \(k^2\) choices for its color, the second \(k^2 - 1\), till the \(k\)th element has \(k^2 - k + 1\) choices. Since there are \((k^2)^k\) possible colorings total, we can lower bound the probability that all elements receive different colors by
+        \[
+            \frac{k^2 (k^2 - 1) \dots (k^2 - k + 1)}{(k^2)^k}
+            \geq%
+            \frac{(k^2 - k)^{k-1}}{(k^2)^{k-1}}
+            =%
+            \del{1 - \frac{1}{k}}^{k-1}
+            \geq%
+            e^{-1},
+        \]
+        which gives the desired constant lower bound.
+    \end{solution}
+    
+    \item Now show that if Version 2 can be solved in \(T(k, n, m)\) time, then Version 1 can be solved in \(O(T(k^2, n, m + O(\log k)))\) time by a randomized algorithm with correctness probability 0.99.
+    
+    \begin{solution}{Eliot Robson}
+        First, observe that if we have a yes instance of Version 1, then we could solve it with Version 2 if were able to put each element of the sum \(s_1, \dots, s_k\) into distinct \(S_1, \dots, S_k\). Thus, our reduction will utilize this observation by randomly coloring the elements of \(S\) with \(k^2\) colors (representing partitioning the elements into the sets \(S_1, \dots, S_{k^2}\)) and then calling Version 2 on this instance. If the algorithm returns yes, we know that there must be distinct elements which sum to \(t\) and are distinct with respect to the original input. Otherwise, if the algorithm returns no, we repeat the coloring process until we achieve the desired error probability.
+        
+        We now give the reduction in detail. Given the set \(S\) of \(n\) elements, we put each of the elements in one of the sets \(S_1, \dots, S_{k^2}\) uniformly at random. As the largest element from the set \(S\) is strictly less than \(2^m\) (assuming also that \(t\) is at most this size), we add the element \(2^m\) to each set \(S_1, \dots, S_{k^2}\). We then set the target value to be \(t + (k^2 - k) \cdot 2^m\), which is just \(t\) with the value of \(k^2 - k\) in the \(O(\log k)\) bits above the max value of \(t\). We then feed this into a solver for Version 2 of the problem.
+        
+        To see this reduction does not give false positives, observe that an element must be chosen from each set to sum to the target value, and thus to achieve the target value, exactly \(k^2 - k\) values of \(2^m\) must be chosen from \(k^2 - k\) of the sets, and \(k\) non-\(2^m\) values must be chosen from \(k\) of the sets. This corresponds to having exactly \(k\) values from the original set \(S\) of numbers chosen to sum to \(t\) in the lower bits.
+        
+        Finally, we will discuss the error probability. Our reduction will succeed so long as every element of \(s_1, \dots, s_k\) is assigned to a different set among \(S_1, \dots, S_{k^2}\). As we showed in part 1, the probability that every element is assigned to a distinct set is at least \(e^{-1}\). Thus, in the case we are given a yes instance, over \(z\) independent repetitions, the probability our reduction outputs no (i.e.\ in every repetition, the elements of the solution do not all get distinct colors) is at most \(\del{1 - \frac{1}{e}}^{z}\). Thus, setting \(z\) to be a large enough constant, we achieve the desired \(0.01\) error probability.
+        
+        The desired runtime follows from the fact that we have \(k^2\) sets being given to the solver for Version 2, and that our new target number takes \(m + O(\log k)\) bits to represent.
+    \end{solution}
+\end{enumerate}
+
+\subsubsection{Problem 4}
+In the \emph{Orthogonal Vectors (OV)} problem, we are given two sets of \(n\) \(d\)-dimensional 0-1 vectors \(A,B \subset \set{0,1}^d\) with \(\abs{A} = \abs{B} = n\), and we want to decide whether there are vectors \(\vec{a} \in A\) and \(\vec{b} \in B\) that are orthogonal. The \emph{Orthogonal Vectors Conjecture (OVC)} of fine-grained complexity states that, for every \(\delta > 0\), there is a \(c \geq 1\) such that OV cannot be solved in \(n^{2-\delta}\) on instances with \(d = c \cdot \lg n\).
+
+One formulation of the \emph{Strong Exponential Time Hypothesis (SETH)} states that, for every \(\epsilon > 0\), there is a \(k\) and \(c\) such that \(k\)-\(\SAT\) for \(n\) variables and \(cn\) clauses requires time \(\Omega((2 - \epsilon)^n)\).
+
+\begin{enumerate}
+    \item Show that OV can be solved in \(O(n^2 \poly(d))\) time.
+    
+    \begin{solution}{Eliot Robson}
+        We can compute the inner product between two \(d\)-dimensional vectors in \(O(\poly(d))\) time. To achieve the desired runtime, we simply take the inner product of all pairs of vectors \(\vec{a} \in A\) and \(\vec{b} \in B\), returning the pair if they are orthogonal.
+    \end{solution}
+    
+    \item Show that OV can be solved in \(O(n 2^{O(d)})\) time.
+    
+    \begin{solution}{Eliot Robson}
+        We start by looking at the vectors \(\vec{a} \in A\). For each one, we can write down a list of all the vectors it is orthogonal to and store these in a shared table of size \(2^{O(d)}\). As each of the \(n\) vectors in \(A\) has at most \(2^{O(d)}\) vectors it is orthogonal to, this step of the algorithm takes \(O(n 2^{O(d)})\) time. Then, our algorithm will search through all the vectors in \(B\) to see if any match those in the table. If a match is found, the algorithm returns yes, otherwise no. This clearly matches the claimed runtime.
+    \end{solution}
+    
+    \item Show a reduction from \(k\)-\(\SAT\) with \(n\) variables and \(m\) clauses to OV with \(O(2^{n/2})\) vectors in \(m\) dimensions, that runs in time \(O(2^{n/2} \poly(m))\).
+    
+    \begin{solution}{Eliot Robson}
+        Suppose we have a CNF formula \(\varphi\) with clauses \(C_1, \dots, C_m\). Define sets of variables \(Y = \set{x_1, \dots, x_{n/2}}\) and \(Z = \set{x_{n/2 + 1}, \dots, x_n}\), where for the assignment \(a \in \set{0,1}^Y\) and \(b \in \set{0,1}^Z\) we define the vectors
+        \[
+            y_a (i)
+            =%
+            \begin{cases}
+                0 &\text{if \(a\) satisfies \(C_i\)}\\
+                1 &\text{otherwise}.
+            \end{cases},
+            \qquad
+            z_b (i)
+            =%
+            \begin{cases}
+                0 &\text{if \(b\) satisfies \(C_i\)}\\
+                1 &\text{otherwise}
+            \end{cases}.
+        \]
+        From this definition, we observe that if the inner product \(\inp{y_a, z_b} = 0\), then for every index \(i = 1, \dots, m\), either \(y_a(i) = 0\) or \(z_b(i) = 0\), meaning that clause \(i\) is satisfied by either assignment \(a\) or \(b\). Thus, \(\varphi\) is satisfiable if and only if the given instance of OV is a yes instance, meaning we have a valid reduction.
+        
+        Finally, to see the desired runtime, observe that we can compute the entries for \(y_a\) and \(z_b\) in \(O(\poly(m))\) time (since we can check if a clause is satisfied by an assignment in constant time, treating \(a\) and \(b\) as the same here), and there are \(2^{n/2}\) possible assignments.
+        
+        %TODO double check runtime, but I think the reduction is right. Works assuming k is constant
+    \end{solution}
+    
+    \item Conclude that SETH implies OVC.
+    
+    \begin{solution}{Eliot Robson}
+        We proceed by contrapositive, so we have an algorithm solving OV in time \(O(n^{2 - \delta})\) where \(d = c \lg n\). If we have an instance of \(k\)-\(\SAT\) with \(cn\) clauses, the using the reduction from part 3, we can solve this instance of \(k\)-\(\SAT\) in \(O((2^{n/2})^{2 - \delta}) < O((2 - \epsilon)^n)\). Observe that the dimension given to the instance in the reduction must be \(d = c' \lg 2^{n/2} = (c'/2) n\), which can be done by setting the constant \(c\) from the \(k\)-\(\SAT\) instance appropriately.
+    \end{solution}
+\end{enumerate}
+
+\section{Spring 2018}
+
+\subsection{Algorithms}
+
+\subsubsection{Problem 1}
+We are given a set \(S\) of \(n\) real numbers, where each element of \(S\) is assigned a color. We want to store \(S\) in a data structure to answer the following type of queries: Given a query interval \([q_a, q_b]\), find the color that occurs the most frequently among the elements in \(S \cap [q_a, q_b]\). Describe an \(\OTilde(n)\) space data structure that supports such queries in \(\OTilde(\sqrt{n})\) time (where \(\OTilde(\cdot)\) suppresses polylogarithmic factors). %Hint divide into sqrt(n) groups of sqrt(n) elements
+
+\begin{solution}{Eliot Robson}
+	%From https://people.scs.carleton.ca/~michiel/rangemedian.pdf
+	Let \(A\) be a sorted array of the input elements \(S\) and split \(A\) into \(\sqrt{n}\) blocks, denoted \(B_1, \dots, B_{\sqrt{n}}\). Then, for each pair \(i,j\) where \(1 \leq i \leq j \leq \sqrt{n}\), compute the most common color in the contiguous blocks \(B_i \cup \dots \cup B_j\) and store these values in an array \(M\) of size \(O(\sqrt{n}^2) = O(n)\). Also, for each color \(c\), we store a sorted list \(L_c\) of all of the elements of that color. With the array \(A\), this data structure has size \(O(n)\).
+	
+	When we get a query interval \([q_a, q_b]\), two cases follow. If the number of elements between \(q_a\) and \(q_b\) is at most \(\sqrt{n}\), we can compute the most common color by taking all of the elements in this interval, sorting them by color, and returning the color with the longest contiguous block. Otherwise, if \(q_a\) and \(q_b\) are in different blocks, let \(q_a \in B_i\) and \(q_b \in B_j\). Then, we know that the most commonly occurring color must be in \(B_i\), \(B_j\), or the most common color of \(B_{i+1} \cup \dots \cup B_{j-1}\) (as a color which is not the most common in this union must be appearing in \(B_i \cup B_j\) to make it the most common in the overall interval). Thus, this gives a list of \(2 \sqrt{n} + 1\) candidates for the most common color. We can read the most common color in the union given in constant time by reading \(M(i+1, j-1)\), so then for each candidate color \(c\), we can binary search for the positions of \(q_a\) and \(q_b\) in \(L_c\), where the number of occurrences of \(c\) is the difference in the positions found. This query takes \(O(\log n)\) time. Thus, doing this query over every candidate color and returning the maximum, the query time is \(\OTilde(\sqrt{n})\) as desired.
+\end{solution}
+
+\subsubsection{Problem 2}
+Let \(G = (V,E)\) be a directed graph where each edge \(e \in E\) has non-negative integer edge length \(\ell(e)\). The \emph{minimum mean cycle} is a cycle \(C\) that minimizes the ratio \(\ell(C) / \abs{C}\), where \(\ell(C) = \sum_{e \in E(C)} \ell(e)\) is the total length of the edges in \(C\), and \(\abs{C}\) is the number of edges in \(C\). Describe a polynomial time algorithm to compute the minimum mean cycle.
+
+\begin{solution}{Eliot Robson}
+	We will give this algorithm by dynamic programming. Specifically, we will use our dynamic program to find the path of cheapest length of each size, and then use this to take the minimum mean cycle over each size. For the first part of our algorithm, we let \(s\) be an arbitrary root vertex and compute the following recurrence via dynamic programming:
+	\[
+		\mathsf{MinPath}(v,n)
+		=%
+		\begin{cases}
+            0 &\text{if } v = s\\
+			\infty &\text{if } n = 0\\
+			\min\limits_{u \in N(v)} \set{\ell(v,u) + \mathsf{MinPath}(u, n-1)} &\text{otherwise}
+		\end{cases}.
+	\]
+	Observe that the length of any cycle can be computed from this DP by, for an edge \(e = (u,v)\), subtracting \(\mathsf{MinPath}(v, n) - \mathsf{MinPath}(v, n - k)\) for a cycle of length \(k\). Then, the minimum mean cycle is given by
+    \[
+        \max_{k \leq n} \min_{v \in V} \frac{\mathsf{MinPath}(v, n) - \mathsf{MinPath}(v, n - k)}{k},
+    \]
+    where the above can be computed in polynomial time by trying all values.
+\end{solution}
+
+\subsubsection{Problem 3}
+Let \(G = (V,E)\) be an undirected graph with non-negative edge costs \(c : E \to \Reals_{+}\). Given a subset \(S \subseteq V\) of nodes called terminals, a tree \(T = (V_T, E_T)\) that is a subgraph of \(G\) is a \emph{Steiner tree} for \(S\) if \(S \subseteq V_T\). A node in \(V_T \setminus S\) is called a \textit{Steiner node}. Finding a minimum cost Steiner tree is an NP-Hard problem.
+
+\begin{enumerate}
+    \item Let \(\abs{S} = k\). Design an algorithm for the Steiner tree problem that runs in time \(n^{O(k)}\) where \(n = \abs{V}\). %How many Steiner nodes can there be with degree >= 3.
+    
+    \begin{scribed}{Qizheng He}{Eliot Robson}
+        There are at most \(O(k)\) nodes in the final Steiner tree with degree at least 3 (as there are at most \(k\) leaves in the final tree). If we condense degree 2 paths into single weighted edges, the spanning tree of this subset must have \(O(k)\) nodes in total. Thus, we can guess the subset of nodes (outside of the \(k\) terminals) which are used in this tree and compute the MST of each subset. There are \(\binom{n}{O(k)} \leq n^{O(k)}\) many possible subsets, and we obtain the desired runtime.
+    \end{scribed}
+
+    \item Design a fixed-parameter tractable (FPT) algorithm for the Steiner tree problem, i.e., an algorithm that runs in time \(f(k) n^c\) where \(c\) is a fixed constant independent of \(k\) and \(f(k)\) is some function of \(k\). There is some algorithm that runs in \(\alpha^{k} n^{c}\) for fixed constants \(\alpha, c\). %Use DP.
+    
+    \begin{solution}{Eliot Robson}
+        Since the optimal solution is a tree, then we can split this tree into two connected components by removing some shortest path from \(u\) to \(v\) for some vertices \(u,v \in V \setminus S\) which are part of the final tree. Then, we will have two subsets of terminals which are disconnected, and we can construct Steiner trees on them recursively. Formally, this DP is as follows:
+        \[
+            T(D, v)
+            =%
+            \min_{u \in V \setminus S, \emptyset \neq D' \subseteq D}
+            \set{T(D', v) + T(D \setminus D, u) + d(u,v)}.
+        \]
+        The final answer for our problem is then \(\min_{v \in V \setminus S} T(S, v)\). As there are \(2^{k} n\) subproblems and each subproblem can be computed in \(O(2^{k} n)\) time, our algorithm overall runs in FPT time (in \(k\)) as desired.
+    \end{solution}
+\end{enumerate}
+
+\subsubsection{Problem 4}
+You are given an undirected graph \(G\) with \(n\) vertices and \(m\) edges, and positive weights on the edges. This graph represents a network of computers. Your task is to deploy DNS servers on these computers. At each round, you can start a single server on one of the computers on the network.
+
+When such a server starts, it broadcasts to the network that it is online, and all the clients for which it is a better server get reassigned to it. Here, for a client \(c\) and servers \(s_1, s_2\), the server \(s_1\) is \emph{better} than \(s_2\) if \(d_G (c, s_1) < d_G (c, s_2)\), where \(d_G(\cdot, \cdot)\) is the shortest path metric of \(G\). Specifically, the clients reassigned to such a new server are all the clients for which the new server is the closest among all the servers running. Unfortunately, reassigning a client to a new server is expensive.
+
+In particular, given a permutation of the vertices of the graph, the \emph{cost} of the permutation is the total number of client reassignments that happened when deploying the servers in the order specified by the permutation.
+
+\begin{enumerate}
+    \item Describe a randomized algorithm that computes a permutation of cost \(O(n \log n)\) (in expectation or with high probability). Prove an upper bound on the number of reassignments.
+    
+    \begin{solution}{Eliot Robson}
+        Our algorithm simply computes a permutation uniformly at random. To show the desired cost in expectation, it suffices to show that every client is reassigned \(O(\log n)\) times (as we can then apply linearity of expectation). For a fixed client \(s\), let \(\pi_1, \dots, \pi_n\) be the vertices of the random permutation. Let \(X_i\) be the indicator random variable for the event that \(\pi_i\) is the closest vertex to \(s\) among the vertices \(\pi_1, \dots, \pi_i\) (so \(X_i = 1\) if \(s\) is reassigned in the opening of \(\pi_i\)). Thus, \(\Exp{X_i} = 1/i\), as this is just the probability that the closest vertex among the first \(i\) read is in position \(i\). Then, the number of reassignments of \(s\) is just the random variable \(Z = \sum_i X_i\), and by linearity of expectation, \(\Exp{Z} = \sum_i \frac{1}{i} = O(\log n)\) gives the desired expected number of reassignments.
+    \end{solution}
+    
+    \item Prove that the cost of \(\Omega(n \log n)\) is a lower bound for certain graphs for all possible permutations.
+    
+    \begin{scribed}{Qizheng He}{Eliot Robson}
+        Consider a path graph. Then, we can represent the number of reassignments as a binary tree where the cost is the total heights of the nodes, which is \(\Omega(n \log n)\).
+    \end{scribed}
+    
+    \item Given a permutation computed by your algorithm, describe how to compute all the reassignments for all clients. How fast is your algorithm?
+    
+    \begin{scribed}{Sariel (473 notes, Section 35.4)}{Eliot Robson}
+        Let \(\pi_1, \dots, \pi_n\) be the permuted vertices of \(G\) given. Let \(\delta(v)\) be the distance to the nearest open server for the vertex \(v\). Initialize \(\delta(v) = \infty\) for all \(v \in V\). In the \(i\)th iteration, set \(\delta(\pi) = 0\) and start an instance of Dijkstra's algorithm from \(\pi_i\). This algorithm propagates only if it improves the current distance from a given vertex (specifically, setting \(\delta(u) = d_G (\pi_i, u)\) only if \(d_G (\pi_i, u) < \delta(u)\) before the iteration started). Each update corresponds to a single reassignment. Each edge is only read at most twice each time a vertex is reassigned, so if there are \(R\) (vertex) reassignments, this algorithm runs in \(O((R + m) \log n)\), and so in expectation for a random permutation, the algorithm runs in \(O(n \log^2 n + m \log n)\).
+    \end{scribed}
+\end{enumerate}
+
+\subsection{Complexity}
+
+\subsubsection{Problem 1}
+For a string \(w \in \set{0,1}\), \(\num(w)\) is the number whose binary representation is \(w\), i.e.,
+\[
+    \num(w)
+    =%
+    \begin{cases}
+        0 &\text{if } w = \epsilon\\
+        2 \num(u) + a &\text{if } w = ua \text{ where } u \in \set{0,1}^*, a \in \set{0,1}.
+    \end{cases}
+\]
+For \(L \subseteq \set{0}^*\), define \(\bin(L) = \set{w \in \set{0,1}^* \mid 0^{\num(w)} \in L}\).
+
+\begin{enumerate}
+    \item Prove that if \(L \subseteq \set{0}^*\) is regular, then \(\bin(L)\) is regular.
+    
+    \begin{solution}{Eliot Robson}
+        Let \(M = (Q, \delta, A, s)\) be a DFA deciding \(L\). Then, since \(L\) does not accept any strings containing any 1's, without loss of generality we can say that on any 1, \(M\) immediately transitions to a sink state, and because all other transitions only take in 0's, then \(M\) must consist of a path of vertices and then a single cycle (as each state in \(M\) can only transition deterministically). Then, we label the vertices in \(M\) as \(p_0, \dots, p_{k-1}\) and \(c_0, \dots, c_{r-1}\) as the vertices in the path and the cycle respectively. In addition, we know that the transitions in \(M\) are of the form \(\delta(p_i, 0) = p_{i+1}\), \(\delta(p_{k-1}, 0) = c_0\), and \(\delta(c_{i}, 0) = c_{(i + 1) \mod r}\).
+        
+        With this structure in hand, we define a new DFA \(M'\) to decide \(\bin(L)\). Our new DFA will be on the same states and has the same accepting states as \(M\), but transition on 0's by doubling the value it has currently read in, and transition on 1's by doubling the current value and adding 1. This is possible in the new DFA as we can associate states in the original DFA with numbers mod \(r\). Specifically, this transition function is
+        \begin{align*}
+            \delta' (p_i, 0)
+            &=%
+            \begin{cases}
+                p_{2i} &\text{if } 2i < k\\
+                c_{(2i - k) \mod r}&\text{otherwise}
+            \end{cases}\\
+            \delta' (p_i, 1)
+            &=%
+            \begin{cases}
+                p_{2i + 1} &\text{if } 2i < k\\
+                c_{(2i + 1 - k) \mod r}&\text{otherwise}
+            \end{cases}\\
+            \delta' (c_i, 0)
+            &=%
+            c_{2i \mod r}\\
+            \delta' (c_i, 1)
+            &=%
+            c_{(2i + 1) \mod r}.
+        \end{align*}
+        Since \(M'\) decides \(\bin(L)\), then \(\bin(L)\) is regular if \(L\) is regular.
+    \end{solution}
+    
+    \item Give an example of a non-regular language \(L \subseteq \set{0}^*\) such that \(\bin(L)\) is regular.
+    
+    \begin{scribed}{David Zheng}{Eliot Robson}
+    	Consider the language \(L = \set{0^{2^n} : n \geq 1}\). This language is not regular (can be proved by fooling set), but \(\bin(L)\) is regular (since we can just check that a given string is a 1 followed by all 0's).
+    \end{scribed}
+\end{enumerate}
+
+\subsubsection{Problem 2 (Du-Ko, Proposition 4.10)}
+A function \(f : \Sigma^* \to \Sigma^*\) is \emph{polynomially honest} if there is a polynomial \(p\) such that \(\abs{w} \leq p(\abs[0]{f(w)})\). A function \(f\) is \textit{one-way} if it is polynomially honest, 1-to-1, and is computable in polynomial time, such that any function \(g\) satisfying \(g(f(w)) = w\) for all \(w\) is not computable in polynomial time. (Note this definition is not the standard one from cryptography).
+
+\(\UP\) is the class of problems that are solved in \(\NP\) by machines that have unique accepting computation. In other words, \(L \in \UP\) if there is an NDTM \(M\) running in polynomial time such that, if \(x \in L\), then \(M\) has a unique accepting computation on \(x\), and if \(x \notin L\), then \(M\) has no accepting computation on \(x\).
+
+\begin{enumerate}
+    \item Prove that there is a one-way function iff \(\Pe \neq \UP\).
+    
+    \begin{solution}{Eliot Robson, David Zheng, Shubhang Kulkarni, and textbook authors}
+        \hfill\\
+        \((\Longrightarrow)\)\\
+        Suppose we have a one-way function \(f\). By definition, we know that computing its inverse \(g\) such that \(g(f(w)) = w\) is not in \(P\). However, given \(y\) in the image of \(f\), we can simply have an NDTM \(M\) guess the value of \(w\) and then check that \(f(w) = y\), accepting if it is. Formally, \(M\) will decide the language \(L\) such that \(\inp{w, i} \in L \iff \set{\exists w : f(w) = y \text{ and } w_i = 1}\). This NDTM runs in polynomial time because \(f(w)\) can be computed in polynomial time. Furthermore, because \(f\) is 1-to-1, the \(w\) in the pre-image is unique, meaning this NDTM has only one accepting computation for each input, so it is \(\UP\). To compute the full pre-image \(w\), we simply query \(M\) for every possible bit \(i\) in the pre-image, which can be done in polynomial time because \(\abs{w} \leq p(\abs[0]{f(w)})\) (i.e., the pre-image is polynomially sized). Thus, computing the inverse of a one-way function serves as a witness to \(\Pe \neq \UP\).
+        
+        \((\Longleftarrow)\)\\
+        We have that \(\Pe \neq \UP\). Take some language \(L \in \UP \setminus \Pe\), and equivalently, there exists a set \(B \in \Pe\) and a polynomial \(p\) such that, for every \(x\), we have that
+        \[
+            x \in A
+            \iff%
+            \exists! y, \abs{y} \leq p(\abs{x}), \inp{x,y} \in B.
+        \]
+        Then define the function
+        \[
+            f(\inp{x,y})
+            =%
+            \begin{cases}
+                \inp{x,1} &\text{if } \inp{x,y} \in B,\\
+                \inp{x, 0y} &\text{otherwise}.
+            \end{cases}
+        \]
+        Then, \(f\) is a 1-to-1 function because, for each \(x\), there is at most one \(y\) such that \(\inp{x,y} \in B\), so there is at most one possible input that will make \(f\) output \(\inp{x,1}\). It is clear that \(f\) is also polynomially honest.
+        
+        Finally, suppose toward contradiction that there is some poly-time computable \(g\) such that \(g(f(\inp{x,y})) = \inp{x,y}\) for every \(\inp{x,y}\). Then, if we take any input \(x\), we simply compute \(z = g(\inp{x,1})\) and check if \(f(z) = \inp{x,1}\), then accept \(x\), rejecting otherwise. This procedure solves for membership in \(L\) in polynomial time, contradicting our initial assumption that \(\Pe \neq \UP\). Thus, no such \(g\) can exist and so \(f\) is one-way as desired.
+    \end{solution} 
+    
+    \item Prove that there is a one-way function whose range is in \(\Pe\) iff \(\Pe \neq \UP \cap \coUP\).
+    
+    \begin{solution}{Eliot Robson}
+        \hfill\\
+        \((\Longleftarrow)\)\\
+        Suppose there is a one-way function \(f\) such that \(\Range(f) \in \Pe\). Then, 
+    \end{solution}
+\end{enumerate}
+
+\subsubsection{Problem 3}
+Consider the following problem: given an undirected graph \(G\), count the number of perfect matchings in \(G\). Suppose there is a polynomial-time algorithm that can approximate the number of perfect matchings to within a factor of \(n^c\) for any graph \(G\) with \(n\) vertices, where \(c\) is a constant. Prove that we can approximate the number of perfect matchings to within a \((1 + \epsilon)\)-factor for any fixed \(\epsilon > 0\) in time polynomial in \(n\) and \(1 / \epsilon\).
+
+\begin{scribed}{Shubhang Kulkarni}{Eliot Robson}
+    Let \(p(G)\) denote the number of perfect matchings in \(G\). Let \(A(G)\) be the output of the given approximation algorithm, so then \(\frac{p(G)}{n^c} \leq A(G) \leq p(G) \cdot n^c\).
+    
+    Let \(G^i\) denote the graph consisting of \(i\) disconnected copies of \(G\), so \(p(G^i) = p(G)^i\) and \(\abs{V(G^i)} = i \cdot n\). Thus by our approximation algorithm, we have that \(\frac{p(G)^i}{(in)^c} \leq A(G^i) \leq p(G^i) \cdot (in)^c\). Let \(\overline{A}(G)\) be the algorithm which constructs \(G^t\) (for \(t\) to be chosen later) and returns \(\sqrt[t]{A(G^t)}\).
+    
+    We claim that \(\overline{A}(G)\) returns the desired \(1/\epsilon\) approximation for \(t\) chosen appropriately. We first show the upper bound. Observe that
+    \[
+        \overline{A}(G)
+        =%
+        \sqrt[t]{A(G^t)}
+        \leq%
+        \sqrt[t]{p(G^t) \cdot (tn)^c}
+        =%
+        p(G) \cdot (tn)^{c / t},
+    \]
+    and to get \((tn)^{c/t} \leq (1 + \epsilon)\) we require that \((c/t) \log (tn) \leq (1 + \epsilon)\).
+    
+    For the lower bound, we see that
+    \[
+        \overline{A}(G)
+        \geq%
+        \sqrt[t]{\frac{p(G)^t}{(in)^c}}
+        =%
+        p(G) (tn)^{-c / t},
+    \]
+    so we want that \((tn)^{-c / t} \geq (1 - \epsilon)\). To achieve this, we can equivalently require that \((-c/t) \log (tn) \leq \log (1 + \epsilon)\). Thus, setting \(t = \frac{cn}{\log(1 + \epsilon)}\) we have that \((-c/t) \log (tn) \leq \log (1 + \epsilon)\) (so in particular, \(t \leq \poly(n, 1/\epsilon)\)) we obtain the desired approximation ratio. This algorithm has runtime \(\poly(nt)\), so by our choice of \(t\), our new algorithm achieves the desired runtime.
+\end{scribed}
+
+
+\subsubsection{Problem 4}
+Recall the Turing Machine model of space -- \(s(n)\) computation for general \(s(n)\), where the input is on a read-only tape but there is an additional read/write work tape of which only \(s(n)\) cells are ever used for any input of size \(n\). For the randomized variant of this model, the machine has two transition functions, each of which happen with probability \(1/2\) at each step.
+
+In this setup, a language \(L\) is in \(\BPL\) (Bounded-Error Probabilistic Logspace) if for every string \(x\), and for every possible application of the transition functions, the machine halts and uses at most \(O(\log n)\) space. Further, if \(x \in L\), then the machine accepts with probability \(\geq 2/3\), and if \(x \notin L\), then the machine accepts \(x\) with probability \(\leq 1/3\).
+
+\begin{enumerate}
+	\item Show that for any string \(x\) of length \(n\), the number of configurations of the machine when computing on \(x\) is at most \(\poly(n)\).
+    
+    \begin{solution}{Eliot Robson}
+        We know that every machine in \(\BPL\) uses \(O(\log n)\) space at the most, meaning that there are only \(2^{O(\log n)} = \poly(n)\) possible strings on the work tape (and thus, \(\poly(n)\) possible locations for the tape head), and because the machine has a constant number of states, there are only \(\poly(n)\) configurations for the machine.
+    \end{solution}
+	
+	\item Show that the probability the \(\BPL\) machine accepts \(x\) can be computed exactly in polynomial time. Pay attention to the size of the numbers. %Hint: dynamic programming
+    
+    \begin{solution}{Eliot Robson}
+        To compute the probability a given \(\BPL\) machine accepts an input \(x\), we will use a dynamic programming algorithm which recursively computes the probability that a given configuration of the machine will accept. Our base cases will be any configuration of the machine which is in an accepting configuration, where the machine clearly accepts with probability 1. Otherwise, in an arbitrary configuration of the machine, there are at most two possible configurations the machine can go to if currently at a state with a probabilistic transition (each with probability \(1/2\)), so the probability the machine accepts from the current configuration is just the average of the probabilities of the two possible configurations after the transition. Then, we simply return the probability given by the starting configuration. This runs in polynomial time because, as discussed in the previous question, there are only polynomially many configurations for the machine.
+    \end{solution}
+	
+	\item Conclude that \(\BPL \subseteq \Pe\).
+    
+    \begin{solution}{Eliot Robson}
+        For some language \(L \in \BPL\) and input \(x\), we can simulate any machine deciding \(L\) deterministically by running the dynamic programming algorithm described in the previous part, accepting if the probability is \(\geq 2/3\). By the definition of \(\BPL\) this means that \(x \in L\). Otherwise, we reject. This is in \(\Pe\) because the algorithm from the previous part runs in polynomial time.
+    \end{solution}
+\end{enumerate}
+
+\section{Spring 2017}
+
+\subsection{Algorithms}
+
+\subsubsection{Problem 1}
+A matroid \(\mathcal{M}\) is a tuple \((N, \mathcal{I})\) where \(N\) is a finite ground set and \(\mathcal{I} \subseteq 2^{N}\) is a collection of \emph{independent sets} that satisfy the following conditions
+\begin{enumerate}
+	\item \(\mathcal{I}\) is non-empty, in particular, \(\emptyset \in \mathcal{I}\). 
+	
+	\item \(\mathcal{I}\) is downward closed, that is, if \(A \in \mathcal{I}\) and \(B \subset A\), then \(B \in \mathcal{I}\).
+	
+	\item If \(A,B \in \mathcal{I}\) and \(\abs{A} < \abs{B}\), then there is an element \(e \in B \setminus A\) such that \(A \cup \set{e} \in \mathcal{I}\).
+\end{enumerate}
+
+A \emph{hypergraph} \(G = (V,E)\) consists of a finite set of vertices \(V\), a collection of edges \(E\) where each \(e \subseteq V\). Graphs are a special case when \(\abs{e} = 2\) for each \(e\). For a set \(S \subseteq V\) let \(\delta_G (S) = \set{e \mid e \cap S \neq \emptyset, e \cap V - S \neq \emptyset}\) denote the set of edges that cross \(S\). Given \(s,t \in V\), an \(s\)-\(t\) the mincut value between \(s\) and \(t\) is \(\min_{S : \abs[0]{S \cap \set{s,t}} = 1} \abs{\delta_G (S)}\).
+
+\begin{enumerate}
+	\item Describe a polynomial time algorithm that, given a hypergraph \(G = (V,E)\) and \(s,t \in V\), computes the mincut value between \(s\) and \(t\). What is the running time of your algorithm as a function of \(n = \abs{V}, m = \abs{E}\), and \(p = \sum_{e \in E} \abs{e}\)?
+
+	\begin{scribed}{Shubhang Kulkarni}{Eliot Robson}
+		Consider the bipartite representation of the hypergraph, where each edge \(e \in E\) has an edge between it and the corresponding vertex \(v \in V\). Then, we add capacities of 1 to every hyperedge vertex \(e\) corresponding to the weight in the original hypergraph, and then give every vertex \(v\) weight infinity. Then, a mincut computed on this graph will only consist of vertices corresponding to edges in the hypergraph, and thus a minimum \(s\)-\(t\) (vertex) cut will correspond to a min cut in the corresponding hypergraph.
+	\end{scribed}
+
+	\item Every graph \(G = (V,E)\) implicitly defines a matroid \(\mathcal{M}_G = (E, \mathcal{I})\) where \(\mathcal{I} = \set{A \subseteq E \mid A \text{ induces a forest}}\). When \(G\) is a hypergraph it is not obvious what it means for \(A\) to induce a forest. Consider the following definition. We say that \(A \subseteq E\) is \emph{forest-representable} if one can choose for each \(e \in A\) two nodes in \(e\) such that the chosen pair, when viewed as edges, form a forest in the graph sense. Show that when \(G = (V,E)\) is a hypergraph, then \((E, \mathcal{I})\) where \(\mathcal{I} = \set{A \subseteq E \mid A \text{ is forest representable}}\) is a matroid. This is called the hypergraphic matroid.
+	
+	\begin{solution}{Eliot Robson}
+		We simply check the three axioms of being a matroid.
+		
+		\begin{enumerate}
+			\item The empty set \(\emptyset\) is vacuously forest representable (as an empty set of edges in a graph is vacuously a forest).
+			
+			\item Take some \(A \in \mathcal{I}\), so \(A\) is forest representable. Then, for each \(e \in A\), there is some pair \(u_e,v_e \in e\) such that the collection \(\set{\set{u_e, v_e}}_{e \in A}\) is a forest. Thus, if we take some \(B \subset A\), the collection \(\set{\set{u_e, v_e}}_{e \in B} \subset \set{\set{u_e, v_e}}_{e \in A}\) is a forest, as subsets of forests are forests.
+			
+			\item For \(A, B \in \mathcal{I}\) where \(\abs{A} < \abs{B}\), we claim that there is some edge \(e \in B \setminus A\) such that there are two vertices \(a,b \in e\) where \(a\) and \(b\) go between two disconnected components of \(A\) (for some fixed forest representation of \(A\)). If there were no such edge, then some forest representation of \(B\) would lie inside some forest representation of \(A\) (in each component), a contradiction as there are more elements in \(B\) than in \(A\). Thus, we can take such an edge and observe that \(A \cup \set{e}\) is forest representable, so \(A \cup \set{e} \in \mathcal{I}\) as desired. \qedhere
+		\end{enumerate}
+	\end{solution}
+	
+\end{enumerate}
+
+\subsubsection{Problem 2}
+Given a set of \(P\) of \(n\) points in 2-dimensions and an integer \(k \leq n\), we want to find \(k\) axis-aligned unit squares that maximize the number of points covered.
+
+\begin{enumerate}
+    \item Let \(b\) be an integer. First show that in the special case when all points \(P\) lie in \(\set{(x,y) \in \Reals^2 : \floor{x} \not\equiv 0 \mod b, \floor{y} \not\equiv 0 \mod b}\), the problem can be solved exactly in \(n^{O(b^2)}\) time by dynamic programming.
+    
+    \begin{solution}{Eliot Robson}
+        Let \(S\) be the set given in the problem statement (so \(P \subset S\)). We can divide \(S\) into \(b \times b\) blocks of cells where the problem can be solved independently on each block. Specifically, in each block, we know that all points can be covered by \(\leq O(b^2)\) many unit squares, so a dynamic programming algorithm based on subsets has at most \(p^{O(b^2)}\) possible subproblems (for a block with \(p\) points). Thus, we can apply separate DP algorithms for each block to obtain the most number of points that can be covered by each possible number of unit squares for each. Then, we can greedily take the set of values of \(k\) for each square together that maximize the total number of points covered.
+    \end{solution}
+    
+    \item Give a polynomial-time approximation scheme for the general problem.
+    
+    \begin{solution}{Eliot Robson}
+    	First, we choose some \(b \geq \epsilon^{-1}\) and use the randomly shifted grid technique, randomly shifting the \(x\) and \(y\) coordinates of each point by the same randomly chosen vector \(v \in \sbr{0,b}^2\). We then apply our algorithm from part 1 on the transformed point set. In this way, we have an optimal solution over every point not excluded by the grid shifting. We only exclude an \(O(1 / \epsilon)\) fraction of the points this way (in expectation), and so we obtain the desired PTAS.
+    \end{solution}
+\end{enumerate}
+
+\subsubsection{Problem 3}
+We are given a set of \(n\) coins. Most of the coins are genuine and have the same weight (1 unit), but there may be up to 2 fake coins, which weights different from 1 unit. We have a scale that can weight any given subset of coins, i.e., determine the exact sum of the weights in the subset. The problem is to decide whether there are any fake coins. %You are not required to find them, but just decide existence
+
+\begin{enumerate}
+	\item Prove tight upper and lower bounds (up to constant factors) on the worst-case number of weighings needed to solve the problem by a deterministic algorithm as a function of \(n\). %Consider binary representation.
+	
+	\begin{solution}{Eliot Robson, Qizheng He}
+		We start by showing the upper bound. Observe that if there is a single fake coin in some set we weigh, then we can detect it immediately (by just checking if the weight matches the number of coins). Thus, we number the coins arbitrarily from \(1\) to \(n\), and then consider the set \(S_i\), which is the set of coins where the \(i\)th bit in their label is a 1 (for \(i = 1, \dots, \ceil{\log n}\)). The labels of the two fake coins must differ in at least one bit, call this bit \(i^*\) (where \(i^*\) is an arbitrary single bit where they differ if there are multiple). If we let \(C\) be the set of all coins, then the sets \(S_{i^*}\) and \(S_{i^*}^c = C \setminus S_{i^*}\) contain one fake coin each, so we can detect the existence of a fake coin by simply weighing \(S_{i^*}\).
+		
+		Using these observations, our algorithm is as follows. We first weigh all \(C\) coins, and if the weight is inconsistent with the number of coins we report there is a fake. Otherwise, we take the weight of all \(S_i\) sets, and if any of them have inconsistent weight, we report there is a fake as well. Otherwise, we report there is no fake. Correctness of this algorithm follows from the preceding discussion. The complexity of this is \(\ceil{\log n} + 1\) weighings.
+		
+		For the lower bound, observe that after each weighing, the largest subset that contains a pair of coins that have not been weighed separately decreases by at least \(1/2\). Since we must weigh each pair separately to detect a fake (as the weight of the pair of fakes could add up to 2), then we must perform \(\Omega(\log n)\) weighings.
+	\end{solution}
+	
+	\item Give a Monte Carlo randomized algorithm that solves the problem using \(O(1)\) weighings with error probability at most \(0.001\).
+	
+	\begin{solution}{Eliot Robson}
+		Place each coin into a set \(S\) to be weighed independently with probability \(1/2\). Then, with probability \(1/2\), only one of the fakes is placed into the set \(S\). Thus, repeating this process \(k = O(1)\) times, the probability that the pair of fakes is never separated (i.e.\ every independent run of the algorithm fails) is at most
+		\[
+			\del{1 - \frac{1}{2}}^k < 0.001,
+		\]
+		for \(k\) chosen appropriately.
+	\end{solution}
+\end{enumerate}
+
+\subsubsection{Problem 4}
+Suppose you are given a DAG \(G\) with a unique source \(s\) and unique sink \(t\). Two paths in \(G\) are \emph{disjointish} if any common subpath contains at most 42 consecutive edges.
+
+\begin{enumerate}
+	\item Describe an algorithm to find two disjointish paths from \(s\) to \(t\) in \(G\) with maximum total length. For full credit, your algorithm should run in \(O(VE)\) time. %Try 1 before doing 42
+    
+    \begin{scribed}{James Hulett and David Zheng}{Eliot Robson}
+        We will use a dynamic programming algorithm based on topological sort. At a high level, this algorithm will use a variation on the longest path DP, keeping track of the positions of both endpoints from the disjoint paths, and only allowing the paths to join together for at most 42 consecutive edges. Thus, if we let \(<\) denote less than in a fixed topological ordering, the resulting dynamic program is as-follows:
+        \[
+            \mathsf{LongestPaths}(u,v,k)
+            =%
+            \begin{cases}
+                0 &u = v = s\\
+                \max_{x : u \leq x < v, x \sim u} \mathsf{LongestPaths}(x,v,42)
+                &u < v\\
+                \max_{y : v \leq y < u, y \sim v} \mathsf{LongestPaths}(u,y,42)
+                &u > v\\
+                \max \begin{cases}
+                    \max\limits_{x,y : x \sim u, y \sim v, x \neq y, x > u, y > v} \mathsf{LongestPaths}(x,y,42)\\
+                    \max\limits_{z : z \sim u, z \sim v, z > u, z > v} \mathsf{LongestPaths}(z,z,k-1)
+                    &\text{if } k > 0.
+                \end{cases}
+            \end{cases}
+        \]
+        The final answer is then \(\mathsf{LongestPaths}(s,s,42)\). To see this has the desired runtime, observe that the total work done is proportional to every pair of vertex and neighborhood of another vertex. Thus, by the handshake lemma, the sum of all neighbors of all vertices is equal to the number of edges, so the total work is \(O(VE)\) (we ignore the number of subproblems induced by \(k\) as we set it to be a constant).
+    \end{scribed}
+    
+	\item Describe an algorithm to compute the size of the largest set of pairwise-disjointish paths from \(s\) to \(t\) in \(G\). For full credit, your algorithm should run in polynomial time.
+	
+	\begin{sketch}{James Hulett, David Zheng}
+		Reduce to max flow by creating vertices that correspond to subpaths of length at most 42 in \(G\). Since \(G\) is a DAG and 42 is a constant, the graph produced by this process is of polynomial size. Thus, a max flow algorithm run on this graph will run in polynomial time.
+	\end{sketch}
+\end{enumerate}
+
+
+
+\subsection{Complexity}
+
+\subsubsection{Problem 1}
+The 1-dimensional Sperner's problem is defined on a 1-dimensional grid on the interval \([0, 2^{n}-1]\), with each integer being a grid point. There are two colors, red and blue, represented by 0 and 1 bits respectively. There is a boolean circuit named \textsc{Color} which outputs the color (0/1 bit) of a grid point when given its bit representation, with the guarantee that \(\textsc{Color}(0) = \text{red}\), \(\textsc{Color}(2^n - 1) = \text{blue}\). We can show that there exists an integer \(0 \leq k \leq 2^{n}-1\) such that \(\textsc{Color}(k) = \text{red}\) and \(\textsc{Color}(k+1) = \text{blue}\), and it can be computed in \(O(n)\) calls to the \(\textsc{Color}\) circuit by doing binary search on \(k\).
+
+Show that checking if there are more than one such \(k\)'s is NP-hard. %Reduce from 3-SAT
+
+\begin{solution}{Eliot Robson}
+	We will show a reduction to SAT in the case where we would like to determine two such \(k\)'s. In particular, given some circuit \(\varphi\) on \(n\) variables as input to SAT, we first check if the assignment \(0^n\) or \(1^n\) is satisfying, accepting if it is. Otherwise, we add the variable \(x_{n+1}\) and define the new circuit \(\varphi' = \varphi \vee x_{n+1}\). The new circuit \(\varphi'\) accepts on all inputs where \(x_{n+1}\). Thus, since we know \(\varphi\) does not accept on the input \(1^n\), we know there is an integer \(k\) where the color changes from red to blue at \(2^n\). Thus, if \(\varphi\) has a satisfying assignment, there will be a second index where this happens (when the highest bit \(x_{n+1} = 0\)), and otherwise there will be only one integer \(k\) where the color changes. Thus, with an algorithm that checks if there is more than one such \(k\), we can solve SAT, showing this problem is NP-hard.
+\end{solution}
+
+\subsubsection{Problem 2}
+
+\begin{solution}{David Zheng}
+Robert said this was very difficult so I didn't attempt it...
+\end{solution}
+
+\subsubsection{Problem 3}
+All Turing machines in this problem are deterministic, have a single two way
+infinite tape, have tape alphabet ${0,1,blank}$, and on each transition must move either left
+or right (they may not stay in the same cell). Are the following problems decidable?
+\begin{enumerate}
+    \item 
+     Given as input the description of a Turing machine M, whether it ever makes a sequence of three consecutive left moves when run with no input (an all blank tape).
+    \begin{solution}{David Zheng}
+    Undecidable. This problem is equivalent to the halting problem. We can simulate any machine with a machine that never moves left more than three times, and only move left three times in a row if it is about to halt. Since the problem of deciding if a Turing machine halts on blank tape is undecidable, so is this problem.
+    \end{solution}
+    \item 
+    Given as input the description of a Turing machine M, whether it ever makes a sequence of two consecutive left moves when run with no input (an all blank tape).
+    \begin{solution}{David Zheng}
+    Decidable. If a Turing machine $M$ never makes two consecutive moves left, its state is describable by the tape character immediately to the left of the head and the internal state of the Turing machine. Thus we can detect cycles in the graph induced by (blank, start state) in polynomial time (via simulation) since there are $O(|\Gamma||Q|)$ if $Q$ is the set of states of $M$ and $\Gamma$ is the tape alphabet. Either we will detect the machine make two consecutive lefts, or we will find a cycle.
+    \end{solution}
+\end{enumerate}
+
+\subsubsection{Problem 4}
+Consider the 2-knapsack problem where we are given \(n\) items each with a non-negative size \(s_i\) and a profit \(p_i\). We are also given 2 knapsacks with capacities \(B_1\) and \(B_2\) respectively. The goal is to find a feasible packing of items into knapsacks to maximize the profit. A packing is simply a partial assignment of items to knapsacks such that the total size of items assigned to a given knapsack does not violate its capacity. Show that there is no FPTAS for this problem unless \(\Pe = \NP\). An FPTAS provides, for each fixed \(\epsilon > 0\), a \((1 - \epsilon)\) approximation in time polynomial in the input size \emph{and} \(1 / \epsilon\).
+
+
+\begin{scribed}{David Zheng}{Eliot Robson}
+	We will reduce from the partition problem, where we are given a set of items with weights, and the task is to split them into two sets such that the sums of the elements in each set are equal. Let the (multi)set \(S\) be the initial set of items and \(w : S \to \Naturals\) be the weight of item \(s \in S\). Given an FPTAS for the knapsack problem, we set the sizes for bins \(B_1\) and \(B_2\) to be half of the total sum of the initial set of items \(S\) and set all item profits to 1. Then, if we have a \((1 - \epsilon)\) approximation algorithm for \(\epsilon = 1/n\), this will solve the problem exactly. So if this can be done in time polynomial in \(1/\epsilon\) and the number of bits needed to represent the initial input, then this is overall polynomial, implying an algorithm in \(\Pe\) exactly solving an \(\NP\)-hard problem.
+\end{scribed}
+
+\section{Spring 2016}
+
+\subsection{Algorithms}
+
+\subsubsection{Problem 1}
+Consider a minimization problem, where for an instance \(I\), its optimal value is non-negative and is denoted by \(\opt(I)\). You are given a polynomial time approximation algorithm \(\mathsf{alg}\) for this optimization problem that can compute a \(c \cdot n\) approximation to the given instance \(I\) (where \(n = \abs{I}\) and \(c\) is a constant).
+
+A polynomial time algorithm \(\mathsf{reducer}\) is a \emph{\((f,g)\)-reduction} if, given any instance \(K\) for which \(\mathsf{alg}\) provides an \(\alpha\) approximation, the algorithm \(\mathsf{reducer}\) generates from \(K\) a new instance \(K'\) of size \(f(\abs[0]{K})\), such that \(\mathsf{alg}\), when run on \(K'\), provides a \(g(\alpha)\) approximation to \(\opt(K')\). Furthermore \(\opt(K') = \opt(K)\).
+
+\begin{enumerate}
+    \item Consider a \((f_1, g_1)\)-reduction, for \(f_1 (x) = 2x\) and \(g_1 (x) = 1 + x/2\). Show how to compute a constant approximation to the optimal value of the given instance \(I\). What in the running time of your algorithm?
+    
+    \begin{solution}{Eliot Robson}
+        Our algorithm proceeds by running the given reduction until 
+    \end{solution}
+    
+    \item Consider a \((f_2, g_2)\)-reduction, for \(f_2 (x) = x^2\) and \(g_2 (x) = 1 + \ln x\). Show how to compute a constant approximation to the optimal value of the given instance \(I\). What is the running time of your algorithm?
+    
+    \item Consider a \((f_3, g_3)\)-reduction, for \(f_3 (x) = x^2\) and \(g_3 (x) = 1 + \sqrt{x}\). Show how to compute a constant approximation to the optimal value of the given instance \(I\). What is the running time of your algorithm?
+\end{enumerate}
+
+\subsubsection{Problem 2}
+Let \(T = (V,E)\) be a free tree (connected, undirected graph with no cycles) where every node \(v\) of \(T\) has a label \(\ell(v)\) from some finite alphabet. Describe an efficient algorithm to find the longest path in \(T\) such that the labels on that path form a palindrome when concatenated along the path.
+
+\begin{solution}{Eliot Robson}
+    We will solve this problem by defining the product graph \(G = (V', E')\) such that
+    \[
+        V' = \set{(v_1, v_2) \in V \times V : \ell(v_1) = \ell(v_2)},
+        \qquad
+        E' = \set{\set{(u_1, u_2), (v_1, v_2)} : (u_1, v_1), (u_2, v_2) \in E}.
+    \]
+    In words, we define a graph \(G\) whose vertices are pairs of vertices which share a label from \(T\), and where two vertices share an edge if both of their component vertices share an edge in \(T\). We first claim that \(G\) is acyclic (and thus also a tree). Observe that if there were a cycle \(C\) in \(G\), this would imply a cycle in the first component of the vertices  of \(C\), which would be a cycle in \(T\), a contradiction.
+    
+    Our algorithm is as follows. For every vertex \((v_1, v_2) \in G\), we use BFS to search for the longest path starting from \((v_1, v_2)\) (we do not need a dynamic programming algorithm since \(G\) is a tree). As every vertex in \(G\) corresponds to two vertices that can be used to extend a palindrome path, this algorithm finds the longest palindrome path starting from \((v_1, v_2)\). If we do this from every start vertex and take the longest path, this algorithm will run in \(O(n^4)\) time (as \(G\) has at most \(O(n^2)\) vertices).
+\end{solution}
+
+\subsubsection{Problem 3}
+Let \(G\) be a simple, regular, undirected graph (no parallel edges, all node degrees are the same). A cycle cover is a collection of vertex disjoint cycles that span the vertices of the graph. It is easy to see that a 2-regular graph has a cycle cover, in fact, \(G\) itself is a cycle cover.
+
+\begin{enumerate}
+    \item Suppose \(G\) is \(2^k\)-regular for some \(k > 1\). Prove that there is a \(2^{k-1}\)-regular subgraph of \(G\).
+    
+    \begin{scribed}{Qizheng He}{Eliot Robson}
+        Without loss of generality we assume \(G\) is connected (otherwise apply the same reasoning to each connected component). If \(G\) is \(2^k\)-regular, then \(G\) has an Eulerian path (as all nodes have even degree). If we delete every other edge in this path, then this will remove exactly half the edges while preserving regularity. Thus we obtain a \(2^{k-1}\)-regular graph.
+    \end{scribed}
+    
+    \item Using the above, prove that every \(2^k\)-regular graph has a cycle cover.
+    
+    \begin{scribed}{Qizheng He}{Eliot Robson}
+        We simply apply this repeatedly until \(k = 1\) and every vertex has degree 2, which is the desired cycle cover.
+    \end{scribed}
+    
+    \item \emph{Hard:} Prove that every regular even-degree graph has a cycle cover.
+    
+    \begin{scribed}{Qizheng He}{Eliot Robson}
+        If \(G\) is \(2k\)-regular, then \(G\) has an Eulerian path, which induces a \(k\)-regular directed graph. We then replace each vertex with \(v_{in}\) and \(v_{out}\), adding an edge from \(v_{in}\) to \(v_{out}\) with capacity 1 exactly. Then let every other edge in \(G\) have capacity 1 and lower bound 0. This new graph has a feasible circulation: Set each new edge with flow 1 and each original edge with flow \(1/k\). This implies the existence of a cycle cover.
+    \end{scribed}
+\end{enumerate}
+
+\subsubsection{Problem 4}
+Suppose we have a set system with ground set \(\mathcal{U}\) and a collection of sets \(\mathcal{S} = \set{S_1, \dots, S_m}\). A set cover is a subset \(\mathcal{S}' \subset \mathcal{S}\) such that \(\bigcup_{A \in \mathcal{S}'} A = \mathcal{U}\). Consider the problem of finding the largest number of \emph{disjoint} set covers in a given set system. That is, we want to find \(\mathcal{S}_1', \dots, \mathcal{S}_h'\) such that for every \(1 \leq j \leq h\), \(\mathcal{S}_j'\) is a set cover, and for \(1 \leq i < j \leq h\), \(\mathcal{S}_i' \cap \mathcal{S}_j' = \emptyset\). For each \(e \in \mathcal{U}\) let \(k_e\) be the number of sets from \(\mathcal{S}\) containing \(e\). Clearly \(k = \min_{e \in \mathcal{U}} k_e\) is an upper bound on the number of disjoint set covers. Describe a randomized algorithm that outputs \(\Omega(k / \log n)\) disjoint set covers in expectation (where \(n = \abs{\mathcal{U}}\)). As a corollary, prove that there always exist \(\Omega(k / \log n)\) disjoint set covers.
+
+\begin{scribed}{James Hulett}{Eliot Robson}
+    At a high level, our algorithm will create \(B = c \cdot (k / \log n)\) buckets (for \(c\) a constant to be chosen later) and put each set into a random bucket. By setting \(c\) appropriately, we will show that each bucket is a set cover with at least some constant probability.
+    
+    In detail, we put sets in each bucket uniformly at random, so the probability that a given element \(e \in \mathcal{U}\) is covered in a fixed bucket \(i\) is at least
+    \begin{align*}
+    	\Prob{e \text{ not covered in bucket } i}
+    	&\leq%
+    	\del{1 - \frac{1}{c \cdot (k / \log n)}}^{k_e}\\
+    	&\leq%
+    	\del{1 - \frac{1}{c \cdot (k / \log n)}}^{k}\\
+    	&\leq%
+    	\exp \del{- \frac{1}{c} \log n}\\
+    	&=%
+    	\frac{1}{n^{1 / c}}.
+    \end{align*}
+	Thus, by a union bound, we have that
+	\[
+		\Prob{\text{Some element \(e \in \mathcal{U}\) is uncovered in some bucket \(i\)}}
+		\leq%
+		\sum_{e \in \mathcal{U}} \sum_{i = 1}^{B} \frac{1}{n^{1/c}}
+		=%
+		\frac{O(n k / \log n)}{n^{1/c}}
+		\leq%
+		\frac{1}{n},
+	\]
+	and so in expectation we get the desired set of disjoint covers (only outputting the covers which are indeed valid covers, so there's no chance of outputting an incorrect answer).
+\end{scribed}
+
+\subsection{Complexity}
+
+\subsubsection{Problem 1}
+For any \(k \in \Naturals\), let \(w_k\) denote the concatenation of all \(k\)-bit long strings (in lexicographic order) separated by \(\#\)'s, i.e., \(w_k = 0^k \# 0^{k-1}1 \# 0^{k-2}10 \# 0^{k-2} 11 \# \dots \# 1^k\).
+
+\begin{enumerate}
+	\item Prove that the language \(L = \set{w_k \mid k \in \mathbb{N}}\) is not regular.
+	
+	\begin{solution}{Eliot Robson}
+		We will prove this by using a fooling set. Specifically, we let our fooling set be \(F = \set{0^n \mid n \geq 1}\). Then for \(x,y \in F\),  so we have that \(x = 0^i\) and \(y = 0^j\) for \(i \neq j\). Then we define the distinguishing suffix \(z = \# 0^{i-1}1 \# 0^{i-2}10 \# 0^{i-2} 11 \# \dots \# 1^i\) as all \(i\)-bit long strings in lexicographic order separated by \(\#\)'s except for \(0^i\). Then, \(xz \in L\) but \(yz \notin L\). Since the set \(F\) is infinite an infinite fooling set for \(L\), then \(L\) is not regular.
+	\end{solution}
+
+	\item Prove that \(L \in \DSPACE(\log \log n)\).
+	
+	\begin{solution}{Eliot Robson}
+		First, observe that for some input \(x \in L\), \(\abs{x} = O(k 2^k)\), so to show the desired claim, we only need an algorithm which runs in \(O(\log \log (k 2^k)) = O(\log (k + \log k))\) space. To do this, we start by reading until the first \(\#\) and check if the first string is all 0's (rejecting otherwise). Then, for the length of the first string (which we denote \(k\)), we check whether each string has length \(k\) (moving in passes of increasing powers of 2, as we can only store \(O(\log k)\) bits if there are \(2^k\) strings each of length \(k\) in the input, due to the space constraint). After affirming the lengths of the strings are as expected, we check each pair of consecutive strings separated by a \(\#\) to affirm that one comes lexicographically after another, rejecting if this is ever not the case. At the end, we check that the last string is all \(1\)'s and accept.
+		
+		This only uses \(O(\log k)\) bits to store the length counter, and \(O(\log k)\) to check that for two consecutive strings, one comes lexicographically after another. This shows the desired algorithm.
+	\end{solution} 
+\end{enumerate}
+
+\subsubsection{Problem 2}
+Recall that \(\NTIME(f(n))\) is the collection of problems solvable in \(f(n)\) time on nondeterministic Turing machines. Prove that \(\Pe \neq \NTIME(n)\) as a corollary of the following two sub-problems.
+\begin{enumerate}
+	\item Prove that if \(\NTIME(n) \subseteq \Pe\) then \(\Pe = \NP\).
+	
+	\item Prove that if \(\Pe \subseteq \NTIME(n)\) then \(\Pe \neq \NP\).
+\end{enumerate}
+
+\begin{solution}{Eliot Robson}
+	The second claim follows immediately from the nondeterministic time hierarchy theorem. Specifically, by this theorem, we know there is some language \(L \in \NTIME(n^2) \setminus \NTIME(n)\), so \(L \in \NP\) but by assumption \(L \notin \Pe\).
+	
+	For the first claim, we will apply a padding argument. Suppose we have some problem \(L \in \NTIME(n^c)\) for an arbitrary fixed \(c\) (so \(L\) is an arbitrary language in \(\NP\)). Consider the language \(L' = \set{x \# 1^{\abs{x}^c} \mid x \in L}\), which is the language of elements of \(L\) padded with \(n^c\) ones. We then define an NDTM \(M_{L'}\) which decides \(L'\) by taking the \(x\) in the input (rejecting if formatted incorrectly) and running it on \(M_L\), the NDTM deciding \(L\). Since \(M_L\) runs in \(n^c\) steps, then \(M_{L'}\) runs in time linear in its input, so \(L' \in \NTIME(n)\). By assumption, then \(L' \in \Pe\). However, this means that we can decide \(L\) with a machine in \(\Pe\) with a factor \(c\) increase in the exponent in the runtime (which is still polynomial), so \(L \in \Pe\). It follows that \(\Pe = \NP\).
+	
+	From these two claims, it is immediate that \(\Pe \neq \NTIME(n)\).
+\end{solution}
+
+\begin{scribed}{Qizheng He}{Eliot Robson}
+	Alternatively, for the first claim, notice that 3-\(\SAT\) is in \(\NTIME(n)\), and if \(\NTIME(n) \subseteq \Pe\), then 3-\(\SAT\) would be in \(\Pe\) and thus \(\Pe = \NP\).
+\end{scribed}
+
+\subsubsection{Problem 4}
+Consider the following two definitions of log-space counting problems. A function \(f : \set{0,1}^* \to \Naturals\) is in \(\Sharp{L_a}\) if there is a non-deterministic Turing machine \(M_f\) that on input \(x\) of length \(n\) uses \(O(\log n)\) space and is such that the number of accepting paths of \(M_f (x)\) equals \(f(x)\). A function \(f : \set{0,1}^* \to \Naturals\) is in \(\Sharp{L_b}\) if there is a relation \(R(\cdot, \cdot)\) that is decidable in log-space and a polynomial \(p\) such that if \(R(x,y)\) then \(\abs{y} \leq p(\abs[0]{x})\) and such that \(f(x) = \abs[1]{\set{y : R(x,y)}}\).
+
+\begin{enumerate}
+	\item Prove that all functions in \(\Sharp{L_a}\) can be computed in polynomial time.
+	
+	\begin{solution}{Eliot Robson}
+		To show this, observe that the NDTM \(M_f\) has a polynomial number of configurations (as it's work tape has \(2^{O(\log n)} = O(n^c)\) possible configurations, there are \(O(n)\) positions for each head, and a constant number of states that it could be currently on). We consider the graph where nodes are configurations of \(M_f\) when run on \(x\) and edges correspond to configurations which can reach one-another. Thus, we first claim that we can assume the graph containing these configurations is a DAG. Indeed, if there is a directed cycle in this graph, it means that there is some path in the (non-deterministic) computation that results in \(M_f\) being in the exact same state as it was in some previous configuration. There is no need to (non-deterministically) transition along any path like this, as it does not advance \(M_f\) to any accepting or rejecting state. Thus, it does not change the accepting or rejecting behavior if we assume \(M_f\) does not have non-deterministic transitions that result in it being in an identical configuration to some previous part of the computation.
+        
+        As we stated, since this configuration graph must be a DAG, we can use a simple DP algorithm from all accepting configurations to the start configuration to count the number of different accepting paths. This runs in polynomial time as the configuration graph is polynomial.
+	\end{solution}
+	
+	\item Prove that \(\Sharp{L_b}\) equals \(\sharpP\). Recall that \(\sharpP\) is the class of functions \(f : \set{0,1}^* \to \Naturals\) such that there is a non-deterministic polynomial TM \(M_f\) such that, for all \(x\), \(f(x)\) equals the number of accepting computation paths of \(M_f\) on \(x\).
+    
+    \begin{scribed}{James Hulett}{Eliot Robson}
+        It is clear that a function in \(\Sharp{L_b}\) can be computed by an \(\sharpP\) machine (as a computation in logspace must take polynomial time), so it remains to show that a function \(f \in \sharpP\) is in \(\Sharp{L_b}\). At a high level, we will show that we can replicate the accepting paths of \(M_f(x)\) through a relation that is decidable in logspace by adding information about the computation of \(M_f(x)\) and simply having the relation \(R\) verify this computation is valid.
+        
+        Formally, we have that has some non-deterministic TM \(M_f\) as given in the above definition. Then, similar to the proof of the Cook-Levin theorem, we let \(y\) be a tableau encoding the execution of \(M_f(x)\) with some hard-coded certificate. Thus, \(\abs{y} \leq \poly(\abs[0]{x})\) (since \(M_f(x)\) runs in polynomial time) and thus \(R(x,y)\) is decidable in logspace (as from the proof of the Cook-Levin theorem, we only need a pointer into the input and to verify that each row of the tableau is consistent with the previous row). Therefore, the number of certificates \(y\) satisfying \(R(x,y)\) is equal to the number of certificates that cause \(M_f(x)\) to accept. Thus \(f(x) = \abs[1]{\set{y \mid R(x,y)}}\), and so \(f \in \Sharp{L_b}\) as desired.
+    \end{scribed}
+\end{enumerate}
+
+\section{Spring 2015}
+
+\subsection{Algorithms}
+
+\subsubsection{Problem 1}
+A matroid \(\mathcal{M}\) is a tuple \((N, \mathcal{I})\) where \(N\) is a finite ground set and \(\mathcal{I} \subseteq 2^{N}\) is a collection of \emph{independent sets} that satisfy the following conditions
+\begin{enumerate}
+    \item \(\mathcal{I}\) is non-empty, in particular, \(\emptyset \in \mathcal{I}\). 
+    
+    \item \(\mathcal{I}\) is downward closed, that is, if \(A \in \mathcal{I}\) and \(B \subset A\), then \(B \in \mathcal{I}\).
+    
+    \item If \(A,B \in \mathcal{I}\) and \(\abs{A} < \abs{B}\), then there is an element \(e \in B \setminus A\) such that \(A \cup \set{e} \in \mathcal{I}\).
+\end{enumerate}
+
+Let \(G = (V,E)\) be a directed graph and let \(r \in V\) and \(T \subseteq V \setminus \set{r}\) be a set of terminals. We say that \(T' \subseteq T\) is \emph{routable} to \(r\) if there is a collection of edge-disjoint paths connecting \(T'\) to \(r\) with one path for each \(t \in T'\). Consider \(\mathcal{M} = (T, \mathcal{I})\) where \(\mathcal{I} = \set{T' \subseteq T \mid T' \text{ is routable to \(r\) in \(G\)}}\). Show that \(\mathcal{M}\) is a matroid.
+
+\begin{solution}{David Zheng}
+    Consider the augmented graph where you add a vertex \(t\) that has edges in from every vertex of \(A \cup B\). We know that in this graph, one can send \(\abs{B}\) units of flow from \(r\) to \(t\) (through the terminals \(B\)). On the other hand, suppose we push \(\abs{A}\) units of flow via the disjoint paths to terminals of \(A\). Call the residual graph \(G'\). Since \(\abs{A} < \abs{B}\), there exists an augmenting path \(p\) in the residual graph from \(r\) to \(t\). It remains to check that \(p\) does not ``unpush'' flow from any of \(A\), i.e.\ it does not use the reverse arc \(t \to u\) for \(u\) in \(A\) (in \(G'\)), but this is obvious since in order to use the arc, you must have pushed flow to \(t\) already.
+\end{solution}
+
+\subsubsection{Problem 2}
+Recall Karger's randomized algorithm for the global minimum cut problem. The algorithm starts with a multigraph \(G = (V,E)\) and picks an edge \(uv \in E\) uniformly at random and contracts the endpoints \(u,v\). It repeats this procedure until the graph has exactly two nodes left and outputs the induced partition as the mincut. Recall that this algorithm is shown to output a correct global mincut with probability \(\Omega(1 / n^2)\). Now consider the \(k\)-cut problem where the goal is to partition the graph into \(k\) non-empty vertex subsets \(V_1, \dots, V_k\) so as to minimize the number of edges crossing the partition. Generalize the global mincut's analysis to obtain a randomized Las Vegas algorithm that outputs the min \(k\)-cut in a given graph with probability at least \(1/2\). What is the running time of your algorithm as a function of \(n\) and \(k\).
+
+\begin{solution}{Eliot Robson}
+    Similar to the original algorithm, our algorithm for this problem will contract a random vertex in each iteration and return the size of the induced mincut once there are only \(k\) vertices left in the graph. We must then establish a lower bound on the success probability of this algorithm. We let \(T\) denote the edges of a fixed mincut where \(t = \abs{T}\). Thus, the probability that an edge from \(T\) gets contracted in the first iteration is \(1 - \frac{t}{\abs{E}}\).
+    
+    Observe that the average degree of \(G\) must be at least \(\floor{2t/k}\) (as otherwise, we could isolate some \(k\) vertices by cutting fewer than \(t\) edges, a contradiction). By the handshake lemma, this implies that
+    \[
+        \floor{2t/k}
+        \leq%
+        \frac{\sum_{v \in V} \deg(v)}{\abs{V}}
+        =%
+        \frac{\abs{E}}{2 \abs{V}}
+        \implies%
+        \abs{E}
+        \geq%
+        \frac{4 t n}{k}.
+    \]
+    Thus, the probability that an edge from \(T\) is chosen is
+    \[
+        \frac{t}{\abs{E}}
+        \leq%
+        \frac{t}{(4 t n / k)}
+        =%
+        \frac{k}{4 n}.
+    \]
+    Thus, the probability \(p_n\) the algorithm avoids contracting an edge of \(T\) in an \(n\)-vertex graph satisfies the recurrence \(p_n \geq \del{1 - \frac{k}{4 n}} p_{n-1}\) where \(p_k = 1\) (as the algorithm simply stops). Expanded, we have that
+    \[
+        p_n
+        \geq%
+        \prod_{i=0}^{n-k-1} \del{1 - \frac{k}{4 (n-i)}}
+        =%
+        \prod_{i=0}^{n-k-1} \del{\frac{4n - 4i - k}{4n - 4i)}}
+        =%
+        \frac{(3k-1) \dots (4k-1)}{(4n) \dots (4n - 4k)},
+    \]
+    so to improve this error probability to be a constant, we need to repeat our algorithm \(\Omega((k/n)^k)\) times.
+\end{solution}
+
+\subsubsection{Problem 3}
+Suppose you are given \(n\) nuts and \(n\) bolts of different but nearly identical sizes. You can easily determine whether any nut is smaller or larger than any bolt, but you cannot directly compare two nuts or two bolts. \textbf{Unlike the standard nuts and bolts problem, there are no matching nut-bolt pairs.} Instead, the nuts and bolts alternate in size. That is, for any pair of bolts, at least one nut is larger than and one and smaller than the other, and for any pair of nuts, at least one bolt is larger than one and smaller than the other. Describe and analyze a randomized algorithm to sort the nuts and bolts by size in \(O(n \log n)\) expected time.
+
+\begin{scribed}{Qizheng He}{Eliot Robson}
+    Let \(A[1, \dots, n]\) be the array of nuts and \(B[1, \dots, n]\) be the array of bolts, and assume that \(A[1] < B[1] < A[2] < B[2] < \dots\). To sort these arrays recursively, we first randomly sample an index \(j\)
+\end{scribed}
+
+\subsubsection{Problem 4}
+
+\subsection{Complexity}
+
+\subsubsection{Problem 1}
+Let \(A\) and \(B\) be two DFAs with \(n\) states each. Prove that if \(L(A) \neq L(B)\), then there is a string \(w\) of length at most \(2n\) that belongs to the symmetric difference of \(L(A)\) and \(L(B)\).
+
+\begin{scribed}{Shubhang Kulkarni}{Eliot Robson}
+	Consider the DFA \(M\) deciding \(L(A) \cup L(B)\). If we run DFA minimization, because \(L(A) \neq L(B)\), the start states of \(A\) and \(B\) cannot be the same in \(M\) and must occupy different equivalence classes. Thus, by the execution of the table-filling algorithm for DFA minimization, there must be a string of length at most the number of new states 
+\end{scribed}
+
+\subsubsection{Problem 2}
+Recall that Mahaney's theorem states that if \(L\)\footnote{\(L\) is sparse if there is a polynomial \(p(n)\) and \(n_0\) such that, for all \(n > n_0\), \(L \cap \set{0,1}^n \leq p(n)\).} is sparse and \(\NP\)-hard, then \(\Pe = \NP\). This observation is strengthened under the \emph{Exponential Time Hypothesis}(ETH) as follows.
+
+The ETH states that there exists some \(c > 0\) such that \(\threeSAT \notin \DTIME(2^{cn})\). We will say that \(L\) is \emph{almost sparse} iff \(\forall \epsilon > 0, \exists n_\epsilon, \forall n \geq n_\epsilon\), \(\abs{L \cap \set{0,1}^n} \leq 2^{n^\epsilon}\). If \(L\) is almost sparse and \(\NP\)-hard, then the ETH is false.
+%Hint: Repeat the proof of Mahaney with a different runtime
+
+
+\subsubsection{Problem 4}
+\begin{enumerate}
+	\item Show that for each \(L \in \DSPACE(n^2)\) there is a function \(f\), computable in \(O(n^2)\) time, such that for all \(x \in \set{0,1}^*\), \(x \in L\) iff \(f(x) \in U\). (In other words, \(f\) is a reduction of \(L\) to \(U\).)
+	
+	\item Using part 1 (or otherwise), show that \(\DSPACE(n^2) \neq \Pe\).
+	%Hint: Space heirarchy and contradiction
+\end{enumerate}
+
+\section{Spring 2013}
+\subsection{Algorithms}
+\subsubsection{Problem 1}
+Consider a finite metric space defined over n points; that is, a complete undirected graph
+G = (V, E) with weights on the edges complying the triangle inequality. We are interested
+in designing a subgraph that would be resistant to attacks of removing some of its vertices,
+and would still have certain desired properties even such attacks.
+
+(A) Prove that there is always a subgraph $H = (V, E')$ of G of weight $O(w(MST)f (n, k))$,
+such that H remains connected even if we delete any set of k of its vertices. Here w(MST)
+is the weight of the minimum spanning tree of G. Your purpose in this question is to
+find the best possible f (n, k). Naturally, the smaller f (n, k) is, the better your solution
+is. Here, f (n, k) = $O(k^2)$ is possible.
+\begin{solution}{David Zheng}
+Part (a). $O(k^2 + k \log(n/k))$ if you take the median of the MST, then recursively divide into parts of size $< 2/3$ original size. Between these sides add a matching of size $k+1$, or if you have $<3k$ vertices, just add the complete graph. 
+\end{solution}
+
+(B) You are given a black box B, such that given any weighted complete graph Z (which
+complies with the triangle inequality), it outputs a subgraph $H \subseteq Z$, of weight $O(w(MST(Z))$,
+such that the shortest path distance in H is at most twice longer than the shortest path
+distance in Z for any pair of vertices (such a graph is a 2-spanner ). You can assume B
+works in polynomial time.
+Given a finite metric space G as above, prove that one can compute in polynomial
+time (using the black box B) a subgraph of total weight O(w(MST)g(n, k)). As before,
+H needs to be a 2-spanner even if we delete any k of its vertices, for any pair of the
+remaining vertices.
+Again, you need to find a scheme with g(n, k) being as small as possible as a function
+of k and n. Doing g(n, k) = kO(1) logO(1) n is possible here.
+Hint: Randomized construction algorithm might be easier to analyze here
+
+\subsubsection{Problem 2}
+\begin{solution}{David Zheng}
+The greedy procedure works here. If you have a parent with a larger label than the child, you can't change labels by contracting, so you must contract the parent with the child. Starting from the root, just do it. This is clearly linear time since you consider each edge (parent child pair) once.
+\end{solution}
+
+\subsubsection{Problem 3}
+
+\begin{solution}{David Zheng}
+Standard flow stuff...
+\end{solution}
+
+\subsubsection{Problem 4}
+A cigar-box juggler typically holds a row of three or more cigar-boxes between his/her
+hands, and manipulates them by moving boxes around. The two end boxes are grasped by the
+juggler’s hands, and the other boxes are supported by squeezing the two end boxes together.
+For example, the following picture shows a cigar-box juggler holding three cigar-boxes.
+A typical move is a ``take-out” in which the juggler grabs a box from somewhere in the
+middle of a line of boxes, and puts it at either the right end (right-handed-take-out) or left
+end (left-handed take-out). The following picture shows the results of a right-handed-take-
+out performed on box number 3.
+
+There is a pretty picture here
+
+A left-handed-take-out would result with the sequence of boxes 3-4-2-5-1.
+The cigar box sorting problem is the following: Given an arbitrary permutation of boxes,
+using only take-outs, sort the boxes into increasing order
+
+(A) Suppose only right-handed take-outs are allowed. Give the best upper and lower bounds
+on the number of (right-handed) take-outs needed in the worst case to sort n cigar-boxes.
+
+\begin{solution}{David Zheng}
+    $n-1$ moves is necessary when array is initially sorted in reverse order.
+    Clearly $n-1$ moves is enough.
+    If you make $n-2$ moves, $2$ boxes are still in the same relative order, that is in reverse.
+\end{solution}
+
+(B) Suppose both right-handed and left-handed take-outs are allowed. Give the best upper
+and lower bounds on the number of take-outs needed in the worst case to sort n cigar-
+boxes.
+\begin{solution}{David Zheng}
+    $n-1$ moves is still necessary for the reverse order array.
+    If you make $n-2$ moves, by the same reasoning, $2$ boxes must be in the same relative ordering.
+\end{solution}
+
+
+\section{Fall 2013}
+\subsection{Problem 1}
+A simple path P in an undirected graph G is induced if the only edges in G between nodes of P are
+the edges of P themselves.
+Prove that for all integers $\ell < n$, any tree T with at least n nodes contains either at least $\ell$
+leaves or an induced path of length at least $\sqrt{n}$. Conclude that any n-node tree contains either at
+least $\sqrt{n}$ leaves or an induced path of length at least $\sqrt{n}$.
+\begin{solution}{David Zheng}
+Let $L$ denote the set of leaves of $T$.
+Fix a leaf $u \in L$.
+Let $p(x,y)$ denote the unique path in the tree from node $x$ to $y$,
+Then, if we consider the path from $u$ to every leaf, we will have traversed the entire tree, so:
+\[ n \le \sum_{v\in L} |p(u,v)| \le |L| \cdot \max_{v\in L} |p(u,v)| \]
+This means that there exists a path of length at least $n/\ell$ if there are at least $\ell$ leaves.
+\end{solution}
+
+\subsection{Problem 2}
+Consider the sequence $x0, x1, x2, \dots$ , where $x_0 = 1$ and every other element $x_i$ is determined by
+an independent fair coin flip with equal probability, either $x_i = x_i-1$ or $x_i = x_{i-1}/2$.
+
+(a) Find the exact value of $E[x_i]$ for every integer $i$.
+
+(b) Prove that there is a constant c such that $\Pr[x_{c lg n} \ge 1/n] \le 1/n^{10}$ for every integer n.
+
+(c) Prove that there is a constant c such that, in a sequence of $c lg n$ independent fair coin flips,
+the probability of getting fewer than $\lfloor \log n \rfloor$ heads is less than $1/n^10$.
+
+(d) Prove that randomized quicksort runs in O(n log n) time with high probability, where n is the
+size of the array being sorted.
+\begin{solution}{David Zheng}
+\begin{enumerate}
+    \item[(a)] $E[x_i] = (3/4)^i$. Prove by induction. Base case trivial as $x_0 = 1$. Inductive step is obvious.
+    \item[(b)] Apply Markov.
+    \item[(c)] Follows from (b) as $3/4 > 1/2$.
+    \item[(d)] Let the coin toss be the probability that we pick a pivot that has rank between $n/4$ and $3n/4$. Union bound over coin tosses.
+\end{enumerate}
+    
+\end{solution}
+
+\section{Spring 2010}
+
+\subsection{Algorithms}
+
+\subsubsection{Problem 2}
+
+Consider the following random process that is done in rounds. It starts with $m$ balls and $n$ bins. In each round, each ball is placed independently into a bin chosen uniformly at random from the $n$ bins. Any ball that lands in a bin by itself is discarded forever. The process continues with the remaining balls until there are no balls left. Show that the expected number of rounds for the process to terminate is $O(\log \log n)$ if we start with $m = n$.
+
+\begin{solution}{James}
+    Initially, define a ``success'' to be an iteration in which we end with at most $.9n$ balls.  Once we have gotten one such success, define a success to be an iteration where, starting from $m$ balls, we end up with at most $\frac{1.1 \cdot m^2}{n}$ balls.  Imagine a pessimistic version of the process where the probability of getting a success in each iteration is unchanged, but a success only decreases the number of balls by the minimum amount to be considered a success, and a failure leaves the number of balls unchanged.  Since this modified process shrinks only slower than the real process, the expected number of rounds for the modified process to finish is an upper bound on the expected number of rounds for the real process to finish.
+    
+    Note now that in the modified process, we need only $O(\log \log n)$ successes in order for the process to terminate.  After one success, we have that there are $0.9n$ balls remaining.  The next success reduces this amount to $\frac{1.1 \cdot (0.9n)^n}{n} = 1.1 \cdot (0.9)^2 \cdot n$ balls.  An additional success past that reduces the number of balls to $(1.1)^3 (0.9)^4 n$ balls.  In general, after $i$ successes, the number of remaining balls is $(1.1)^{2^{i - 1} - 1} \cdot (0.9)^{2^{i - 1}} \cdot n \leq (.99)^{2^{i - 1}} n$.  In order to reduce the number of balls to 1 (at which point the process immediately terminates), we need to have $(.99)^{2^{i - 1}} = \frac{1}{n}$, so $2^{i - 1} = O(\log n)$ and hence $i = O(\log \log n)$.
+    
+    Finally, we prove that in the modified game, it takes only a constant number of rounds in expectation to get each success.  Consider the first success.  At this point there are $n$ balls and $n$ bins, so the probability of a bin being empty is $(1 - \frac{1}{n})^n \leq \frac{1}{e} < 0.4$.  Thus, by a Markov bound, the probability that the fraction of empty bins is larger than $0.45$ is at most $\frac{0.4}{0.45} = \frac{8}{9}$.  Note that if the fraction of empty bins is smaller than $0.45$, at least $0.55n$ bins are full--but since there are only $n$ balls, at least $0.1n$ of the balls must be alone in order to fill this many bins.  Thus, we have that the probability that at least $0.1n$ balls get eliminated is at least $1 - \frac{8}{9} = \frac{1}{9}$, so the first success needs at most $9 = O(1)$ trials in expectation to happen.
+    
+    Consider now any success after the first.  For any given ball, we have that the probability that it lands in a bin with another ball is at most $\frac{m - 1}{n} \leq \frac{m}{n}$ (imagine throwing all the other balls first--there are at most $m - 1$ bins with another ball in them, so the ball we are looking at has at most this chance of landing in one of those bins).  Thus, the expected number of balls that land in the same bin as another is at most $\frac{m^2}{n}$, so by a Markov bound, there is a probability of at most $\frac{1}{1.1} = \frac{10}{11}$ that more than $\frac{1.1 \cdot m^2}{n}$ balls survive this round.  In other words, there is at least a $1 - \frac{10}{11} = \frac{1}{11}$ chance that we have a success, so in expectation we need only $11 = O(1)$ rounds to get each success after the first.
+    
+    Note now that by linearity of expectation, the expected amount of time to get each of the successive successes we need is just the sum of the expected amount of time to get each individual success.  Thus, the expected time for the modified process to finish is a sum of $O(\log \log n)$ terms, where each term is $O(1)$, and so is overall $O(\log \log n)$.  As stated before, the expected run time of the modified process is only longer than the expected run time of the real process, and so the real process also in expectation needs $O(\log \log n)$ rounds to terminate.
+\end{solution}
+
+
+
+\end{document}
